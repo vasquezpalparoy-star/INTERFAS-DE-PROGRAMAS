@@ -273,7 +273,7 @@
                 <div class="w-1/3 border-r border-dark-border p-2 space-y-1 bg-black/10">
                     <button class="settings-tab active w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-white bg-white/10" data-target="set-appearance">Apariencia</button>
                     <button class="settings-tab w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-dark-muted hover:bg-white/5" data-target="set-behavior">Comportamiento</button>
-                    <button class="settings-tab w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-dark-muted hover:bg-white/5" data-target="set-sync">Cuenta & Nube</button>
+                    <button class="settings-tab w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-dark-muted hover:bg-white/5" data-target="set-sync">Backup & Nube</button>
                     <button class="settings-tab w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-dark-muted hover:bg-white/5" data-target="set-calc">Calculadora</button>
                 </div>
                 <div class="w-2/3 p-6 space-y-6">
@@ -313,54 +313,8 @@
 
                     <!-- Backup y Sync -->
                     <div id="set-sync" class="settings-pane hidden-safely">
-                        <h3 class="text-md font-bold text-white mb-4">Sincronización en la Nube</h3>
-                        
-                        <!-- Panel de Cuenta Anónima Mejorado -->
-                        <div id="auth-anonymous-ui" class="space-y-4 mb-6">
-                            <div class="p-3 bg-brand-900/20 border border-brand-500/30 rounded-lg">
-                                <p class="text-sm text-brand-400 font-medium mb-1"><i class="fa-solid fa-user-secret"></i> Sesión Anónima Activa</p>
-                                <p class="text-xs text-dark-muted mb-2">Tu ID local: <span id="anon-uid-display" class="font-mono text-white bg-black/50 px-1 rounded select-all">Cargando...</span></p>
-                                <p class="text-xs text-dark-muted leading-relaxed">
-                                    ⚠️ Los ID anónimos <b>cambian</b> si limpias el navegador o si abres el archivo HTML desde tu PC sin un servidor local. Si tu ID cambia, tus datos parecerán desaparecer. <br><b>Solución:</b> Crea una cuenta abajo.
-                                </p>
-                            </div>
-                            <div>
-                                <input type="email" id="auth-email" placeholder="Correo electrónico" class="w-full rounded-lg glass-input p-2.5 text-sm mb-2">
-                                <input type="password" id="auth-password" placeholder="Contraseña" class="w-full rounded-lg glass-input p-2.5 text-sm mb-4">
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="App.login()" class="flex-1 bg-brand-600 hover:bg-brand-500 text-white py-2 rounded-lg text-sm font-medium transition-colors">Iniciar Sesión</button>
-                                <button onclick="App.register()" class="flex-1 bg-dark-bg border border-dark-border hover:bg-white/5 text-white py-2 rounded-lg text-sm font-medium transition-colors">Crear Cuenta (Guardar Datos)</button>
-                            </div>
-                            <div id="auth-error" class="text-red-400 text-sm hidden-safely mt-2 bg-red-900/20 p-2 rounded border border-red-500/30"></div>
-                        </div>
-
-                        <!-- Panel de Cuenta Registrada -->
-                        <div id="auth-logged-in-ui" class="hidden-safely space-y-4 mb-6">
-                            <div class="p-3 bg-green-900/20 border border-green-500/30 rounded-lg flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">
-                                    <i class="fa-solid fa-user-check text-xl"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-green-400 font-medium">Cuenta Conectada de Forma Segura</p>
-                                    <p id="auth-user-email" class="text-xs text-white"></p>
-                                </div>
-                            </div>
-                            <div class="p-3 bg-dark-panel border border-dark-border rounded-lg flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div id="sync-status-icon" class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></div>
-                                    <span id="sync-status-text" class="text-sm text-dark-muted font-medium">Sincronización Activa</span>
-                                </div>
-                            </div>
-                            <button onclick="App.logout()" class="w-full bg-dark-bg border border-dark-border hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/30 text-white py-2 rounded-lg text-sm font-medium transition-colors mt-2">
-                                Cerrar Sesión
-                            </button>
-                        </div>
-
-                        <hr class="border-dark-border my-6">
-
                         <h3 class="text-md font-bold text-white mb-4">Backups Locales</h3>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 mb-6">
                             <button onclick="App.exportBackup()" class="flex-1 bg-dark-bg border border-dark-border hover:bg-white/5 text-white py-2 rounded-lg text-sm flex items-center justify-center gap-2 transition-colors">
                                 <i class="fa-solid fa-download"></i> Crear Backup
                             </button>
@@ -368,6 +322,13 @@
                                 <i class="fa-solid fa-upload"></i> Restaurar
                                 <input type="file" id="import-file" class="hidden" accept=".json" onchange="App.importBackup(event)">
                             </label>
+                        </div>
+                        
+                        <h3 class="text-md font-bold text-white mb-2">Sincronización Firebase</h3>
+                        <p class="text-xs text-dark-muted mb-4">La configuración de Firebase ya está integrada. La sincronización se realiza en segundo plano automáticamente.</p>
+                        <div class="p-3 bg-green-900/20 border border-green-500/30 rounded-lg flex items-center gap-3">
+                            <div id="sync-status-icon" class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></div>
+                            <span id="sync-status-text" class="text-sm text-green-400 font-medium">Sincronización Activa</span>
                         </div>
                     </div>
 
@@ -400,8 +361,7 @@
     <!-- Firebase SDK (Módulos) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        // Importamos setPersistence y browserLocalPersistence para obligar al navegador a guardar la sesión
-        import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'grafiplot-hub';
@@ -422,7 +382,6 @@
 
         let db, auth, userId;
         let isFirebaseInitialized = false;
-        let isUIInitialized = false;
 
         async function initFirebase() {
             try {
@@ -430,59 +389,30 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Obligamos a Firebase a intentar guardar el inicio de sesión permanentemente
-                try {
-                    await setPersistence(auth, browserLocalPersistence);
-                } catch(e) { console.warn("El navegador bloqueó la persistencia local:", e); }
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
 
-                // Escuchar cambios de sesión de forma dinámica
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        isFirebaseInitialized = true;
-                        console.log("Firebase conectado. Usuario UID:", userId, user.isAnonymous ? "(Anónimo)" : "(Email)");
-                        
-                        // Actualizar interfaz con estado de conexión
-                        const iconTop = document.getElementById('firebase-status-icon-top');
-                        if (iconTop) {
-                            iconTop.className = 'fa-solid fa-cloud text-green-500';
-                            iconTop.parentElement.title = user.isAnonymous ? "Sincronizado en la Nube (Anónimo)" : "Sincronizado (" + user.email + ")";
-                        }
-                        
-                        App.updateAuthUI(user);
+                userId = auth.currentUser?.uid;
+                if (!userId) throw new Error("ID de usuario no encontrado.");
 
-                        // Cargar datos (Paso Crítico)
-                        await StorageDB.loadFromFirebase();
-                        
-                        // Inicializar o recargar la Interfaz
-                        if (!isUIInitialized) {
-                            isUIInitialized = true;
-                            UI.init();
-                        } else {
-                            // Actualizar la vista sin duplicar eventos
-                            UI.renderCategories();
-                            UI.applySettings();
-                            if(State.session.activeScreens.some(s => s.toolId)) {
-                                document.getElementById('screen-selector').value = State.session.screenLayout || '1';
-                                UI.updateWorkspaceGrid(State.session.screenLayout || '1');
-                                UI.switchToWorkspace();
-                            } else {
-                                UI.renderToolsGrid(State.session.currentView);
-                            }
-                            Notes.renderAll();
-                            UI.initCalculator();
-                        }
+                isFirebaseInitialized = true;
+                console.log("Firebase conectado correctamente. Usuario:", userId);
+                
+                // Actualizar interfaz con estado de conexión
+                const iconTop = document.getElementById('firebase-status-icon-top');
+                if (iconTop) {
+                    iconTop.className = 'fa-solid fa-cloud text-green-500';
+                    iconTop.parentElement.title = "Sincronizado en la Nube";
+                }
+                const syncIcon = document.getElementById('sync-status-icon');
+                if (syncIcon) syncIcon.className = 'w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]';
+                const syncText = document.getElementById('sync-status-text');
+                if (syncText) syncText.textContent = 'Sincronización Activa';
 
-                    } else {
-                        // Si no hay sesión, iniciar anónimamente
-                        if (typeof __initial_auth_token !== 'undefined') {
-                            signInWithCustomToken(auth, __initial_auth_token).catch(() => signInAnonymously(auth));
-                        } else {
-                            signInAnonymously(auth);
-                        }
-                    }
-                });
-
+                await StorageDB.loadFromFirebase();
             } catch (e) {
                 console.warn("Trabajando en modo local por error de conexión.", e);
                 
@@ -498,11 +428,9 @@
                 if (syncText) syncText.textContent = 'Error: ' + e.message;
 
                 StorageDB.loadLocalFallback();
-                if (!isUIInitialized) {
-                    isUIInitialized = true;
-                    UI.init();
-                }
             }
+            // Iniciar UI después de tener los datos listos
+            UI.init();
         }
 
         // ==========================================
@@ -551,6 +479,7 @@
                     const syncText = document.getElementById('sync-status-text');
                     const syncIcon = document.getElementById('sync-status-icon');
                     
+                    // Dar feedback visual INMEDIATO al usuario de que la app detectó el cambio
                     if(iconTop) { 
                         iconTop.className = 'fa-solid fa-cloud-arrow-up text-yellow-400 animate-pulse'; 
                         iconTop.parentElement.title = "Guardando en la nube..."; 
@@ -558,12 +487,16 @@
                     if(syncText) syncText.textContent = 'Guardando cambios...';
                     if(syncIcon) syncIcon.className = 'w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_8px_#facc15]';
 
+                    // Limpiar intentos anteriores para no saturar la base de datos al escribir rápido
                     clearTimeout(StorageDB.saveTimeout);
+                    
+                    // Ejecutar guardado final a Firebase tras 600ms de inactividad
                     StorageDB.saveTimeout = setTimeout(async () => {
                         try {
                             const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'master');
                             await setDoc(docRef, dataObj);
                             
+                            // Feedback de éxito
                             if(iconTop) { 
                                 iconTop.className = 'fa-solid fa-check text-green-400'; 
                                 iconTop.parentElement.title = "Guardado con éxito"; 
@@ -571,6 +504,7 @@
                             if(syncText) syncText.textContent = 'Sincronizado';
                             if(syncIcon) syncIcon.className = 'w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]';
                             
+                            // Restaurar el icono de la nube estándar tras 2 segundos
                             setTimeout(() => {
                                 if(iconTop && iconTop.classList.contains('fa-check')) {
                                     iconTop.className = 'fa-solid fa-cloud text-green-500 transition-colors duration-500';
@@ -585,7 +519,7 @@
                             if(syncText) syncText.textContent = 'Error al sincronizar';
                             if(syncIcon) syncIcon.className = 'w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]';
                         }
-                    }, 600);
+                    }, 600); // 600 milisegundos de agrupación
                 }
             },
             loadFromFirebase: async () => {
@@ -593,15 +527,14 @@
                     const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'master');
                     const snap = await getDoc(docRef);
                     if (snap.exists()) {
-                        console.log("Éxito: Datos descargados de Firebase correctamente.");
                         StorageDB.applyData(snap.data());
                     } else {
-                        console.warn("Aviso: Firebase no encontró datos para el UID:", userId, ". Esto sucede si el UID es nuevo.");
+                        // Si la nube está vacía, intentamos cargar de local y luego subimos a la nube
                         StorageDB.loadLocalFallback();
                         StorageDB.save(); 
                     }
                 } catch(e) {
-                    console.error("Error crítico al recuperar datos de Firebase:", e);
+                    console.error("Fallo al recuperar datos de la nube:", e);
                     StorageDB.loadLocalFallback();
                 }
             },
@@ -741,12 +674,14 @@
                 select.innerHTML = '';
 
                 State.categories.forEach(cat => {
+                    // Sidebar
                     const btn = document.createElement('button');
                     btn.className = 'nav-btn flex items-center gap-3 w-full p-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/5 text-dark-muted truncate';
                     btn.dataset.view = cat.id;
                     btn.innerHTML = `<i class="fa-solid ${cat.icon} w-5 text-center"></i> <span class="truncate">${cat.name}</span>`;
                     list.appendChild(btn);
 
+                    // Select form
                     const opt = document.createElement('option');
                     opt.value = cat.id;
                     opt.textContent = cat.name;
@@ -768,6 +703,7 @@
                 grid.className = `workspace-grid grid-${layout}`;
                 
                 const count = parseInt(layout);
+                // Ajustar array de State.session.activeScreens
                 while(State.session.activeScreens.length < count) {
                     State.session.activeScreens.push({ id: State.session.activeScreens.length + 1, toolId: null });
                 }
@@ -790,6 +726,7 @@
                     if (screen.toolId) {
                         const tool = State.tools.find(t => t.id === screen.toolId);
                         if (tool) {
+                            // Validar contraseña si la tiene
                             if(tool.password && !screen.unlocked) {
                                 cell.innerHTML = `
                                     <div class="flex-1 flex flex-col items-center justify-center bg-dark-bg text-white p-6">
@@ -802,6 +739,7 @@
                                     </div>
                                 `;
                             } else {
+                                // Herramienta abierta
                                 cell.innerHTML = `
                                     <div class="iframe-header flex justify-between items-center group">
                                         <div class="flex items-center gap-2 overflow-hidden">
@@ -819,9 +757,10 @@
                                 `;
                             }
                         } else {
-                             App.closeScreenTool(screen.id); 
+                             App.closeScreenTool(screen.id); // Herramienta ya no existe
                         }
                     } else {
+                        // Celda vacía
                         cell.innerHTML = `
                             <div class="flex-1 flex flex-col items-center justify-center bg-dark-bg/50 border border-dashed border-dark-border/50 text-dark-muted">
                                 <i class="fa-solid fa-desktop text-3xl mb-3 opacity-50"></i>
@@ -885,6 +824,7 @@
 
             // Listeners Generales
             setupEventListeners: () => {
+                // Navegación Sidebar
                 document.getElementById('sidebar-menu').addEventListener('click', (e) => {
                     const btn = e.target.closest('.nav-btn');
                     if(btn) {
@@ -894,20 +834,24 @@
                     }
                 });
 
+                // Buscador
                 document.getElementById('global-search').addEventListener('input', (e) => {
                     UI.renderToolsGrid(State.session.currentView, e.target.value);
                 });
 
+                // Multipantalla
                 document.getElementById('screen-selector').addEventListener('change', (e) => {
                     const layout = e.target.value;
                     UI.updateWorkspaceGrid(layout);
                     UI.switchToWorkspace();
                 });
 
+                // Clic fuera de menús para cerrarlos
                 document.addEventListener('click', () => {
                     document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add('hidden-safely'));
                 });
 
+                // Settings listeners
                 const updateBg = () => {
                     State.settings.bgUrl = document.getElementById('setting-bg-url').value;
                     State.settings.bgOpacity = document.getElementById('setting-bg-opacity').value;
@@ -939,6 +883,7 @@
                     UI.initCalculator();
                 });
 
+                // Pestañas de configuración
                 document.querySelectorAll('.settings-tab').forEach(tab => {
                     tab.addEventListener('click', (e) => {
                         document.querySelectorAll('.settings-tab').forEach(t => {
@@ -953,6 +898,7 @@
                     });
                 });
 
+                // Atajos de teclado
                 document.addEventListener('keydown', (e) => {
                     if (e.ctrlKey && e.key === 'k') { e.preventDefault(); document.getElementById('global-search').focus(); }
                     if (e.ctrlKey && e.key === 'n') { e.preventDefault(); UI.openAddToolModal(); }
@@ -963,6 +909,7 @@
                     }
                 });
 
+                // Drag básico para paneles
                 UI.makeDraggable('notes-panel', 'notes-header');
                 UI.makeDraggable('calc-panel', 'calc-header');
             },
@@ -981,7 +928,7 @@
                         pos3 = e.clientX; pos4 = e.clientY;
                         el.style.top = (el.offsetTop - pos2) + "px";
                         el.style.left = (el.offsetLeft - pos1) + "px";
-                        el.style.right = 'auto'; 
+                        el.style.right = 'auto'; // Disable right anchoring once dragged
                     };
                 };
             },
@@ -991,6 +938,7 @@
                 if (State.settings.calcType === 'custom' && State.settings.calcUrl) {
                     content.innerHTML = `<iframe src="${State.settings.calcUrl}" class="w-full h-full border-none"></iframe>`;
                 } else {
+                    // Calculadora Básica Integrada (HTML simple)
                     content.innerHTML = `
                         <div class="h-full bg-dark-bg p-3 flex flex-col gap-2 rounded-b-xl text-white">
                             <input type="text" id="calc-display" class="w-full h-12 glass-input text-right text-xl rounded-lg px-3 mb-2" readonly value="0">
@@ -1027,60 +975,6 @@
         window.App = {
             generateId: () => 't_' + Math.random().toString(36).substr(2, 9),
             
-            // --- Sistema de Cuentas ---
-            login: async () => {
-                const email = document.getElementById('auth-email').value;
-                const pass = document.getElementById('auth-password').value;
-                const errDiv = document.getElementById('auth-error');
-                if(!email || !pass) return;
-                try {
-                    errDiv.classList.add('hidden-safely');
-                    await signInWithEmailAndPassword(auth, email, pass);
-                } catch(e) {
-                    errDiv.textContent = 'Error: ' + e.message;
-                    errDiv.classList.remove('hidden-safely');
-                }
-            },
-
-            register: async () => {
-                const email = document.getElementById('auth-email').value;
-                const pass = document.getElementById('auth-password').value;
-                const errDiv = document.getElementById('auth-error');
-                if(!email || !pass) return;
-                try {
-                    errDiv.classList.add('hidden-safely');
-                    // Al crear cuenta sobre un usuario anónimo, la sesión local actual en RAM se mantiene.
-                    await createUserWithEmailAndPassword(auth, email, pass);
-                    // Forzamos guardado: Así, los datos que tenías como anónimo se envían a tu nueva cuenta vinculada.
-                    setTimeout(() => StorageDB.save(), 2000); 
-                } catch(e) {
-                    errDiv.textContent = 'Error: ' + e.message;
-                    errDiv.classList.remove('hidden-safely');
-                }
-            },
-
-            logout: async () => {
-                try { await signOut(auth); } catch(e) { console.error(e); }
-            },
-
-            updateAuthUI: (user) => {
-                const anonUI = document.getElementById('auth-anonymous-ui');
-                const loggedUI = document.getElementById('auth-logged-in-ui');
-                if (user && !user.isAnonymous) {
-                    anonUI.classList.add('hidden-safely');
-                    loggedUI.classList.remove('hidden-safely');
-                    document.getElementById('auth-user-email').textContent = user.email;
-                    document.getElementById('auth-email').value = '';
-                    document.getElementById('auth-password').value = '';
-                } else if (user && user.isAnonymous) {
-                    anonUI.classList.remove('hidden-safely');
-                    loggedUI.classList.add('hidden-safely');
-                    const uidDisplay = document.getElementById('anon-uid-display');
-                    if(uidDisplay) uidDisplay.textContent = user.uid; // Muestra el ID Anónimo en pantalla
-                }
-            },
-            // --------------------------
-
             loadInitialData: () => {
                 State.tools = [
                     { id: 't_1', name: 'Redimensionar DNI', desc: 'Preparar fotografías para imprimir en tamaño DNI.', url: 'https://photopea.com', categoryId: 'cat-1', icon: 'fa-id-card', favorite: true },
@@ -1139,6 +1033,7 @@
             deleteTool: (id) => {
                 if(confirm("¿Seguro que deseas eliminar esta herramienta?")) {
                     State.tools = State.tools.filter(t => t.id !== id);
+                    // Remover de recientes y pantallas
                     State.recents = State.recents.filter(rid => rid !== id);
                     State.session.activeScreens.forEach(s => { if(s.toolId === id) s.toolId = null; });
                     
@@ -1157,20 +1052,30 @@
                 }
             },
 
+            // Lógica de apertura en el Workspace
             openTool: (toolId) => {
+                // Agregar a recientes
                 State.recents = [toolId, ...State.recents.filter(id => id !== toolId)].slice(0, 10);
+                
+                // Buscar una pantalla libre
                 let screen = State.session.activeScreens.find(s => !s.toolId);
-                if (!screen) screen = State.session.activeScreens[0];
+                
+                if (!screen) {
+                    // Si no hay libres, usar la primera (reemplazar)
+                    screen = State.session.activeScreens[0];
+                }
 
                 screen.toolId = toolId;
-                screen.unlocked = false;
+                screen.unlocked = false; // Reset lock state
                 
                 StorageDB.save();
                 UI.switchToWorkspace();
                 UI.renderWorkspaceScreens();
             },
 
-            openToolExternal: (url) => { window.open(url, '_blank'); },
+            openToolExternal: (url) => {
+                window.open(url, '_blank');
+            },
 
             closeScreenTool: (screenId) => {
                 const screen = State.session.activeScreens.find(s => s.id === screenId);
@@ -1184,13 +1089,18 @@
             expandScreen: (screenId) => {
                 const grid = document.getElementById('workspace-grid');
                 if (grid.classList.contains('expanded-mode')) {
+                    // Restaurar
                     grid.classList.remove('expanded-mode');
                     grid.className = `workspace-grid grid-${State.session.screenLayout || '1'}`;
                     document.querySelectorAll('.iframe-container').forEach(c => c.style.display = 'flex');
                 } else {
+                    // Expandir
                     grid.className = 'workspace-grid grid-1 expanded-mode';
                     document.querySelectorAll('.iframe-container').forEach(c => {
                         if (parseInt(c.dataset.screenId) !== screenId) c.style.display = 'none';
+                        else {
+                            // Actualizar botón de expandir a restaurar visualmente si quisieramos
+                        }
                     });
                 }
             },
@@ -1211,6 +1121,7 @@
                 }
             },
 
+            // Backups
             exportBackup: () => {
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage.getItem('imprenta_data')));
                 const node = document.createElement('a');
@@ -1227,13 +1138,16 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
+                        // Limpiar doble stringify si existe
                         let content = e.target.result;
                         if(content.startsWith('"')) content = JSON.parse(content); 
+                        
                         localStorage.setItem('imprenta_data', content);
                         alert("Backup restaurado. La aplicación se recargará.");
                         location.reload();
                     } catch (err) {
                         alert("Error al leer el archivo de backup.");
+                        console.error(err);
                     }
                 };
                 reader.readAsText(file);
@@ -1247,30 +1161,43 @@
                 green: 'bg-green-100 border-green-300 text-green-900',
                 red: 'bg-red-100 border-red-300 text-red-900'
             },
+            
             add: (colorKey) => {
                 const note = { id: App.generateId(), text: '', color: colorKey, date: Date.now() };
                 State.notes.unshift(note);
                 StorageDB.save();
                 Notes.renderAll();
             },
+
             remove: (id) => {
                 State.notes = State.notes.filter(n => n.id !== id);
                 StorageDB.save();
                 Notes.renderAll();
             },
+
             update: (id, text) => {
                 const note = State.notes.find(n => n.id === id);
-                if(note) { note.text = text; StorageDB.save(); }
+                if(note) {
+                    note.text = text;
+                    StorageDB.save();
+                }
             },
+
             evalMath: (noteId) => {
                 const ta = document.getElementById('note-' + noteId);
                 if(!ta) return;
                 let val = ta.value;
-                if (val.trim().endsWith('=')) val = val.substring(0, val.lastIndexOf('='));
+                // Si el usuario presionó el botón y ya tenía un '=', lo ignoramos para procesar
+                if (val.trim().endsWith('=')) {
+                    val = val.substring(0, val.lastIndexOf('='));
+                }
+                
                 try {
+                    // Busca solo la operación matemática al final (ignorando el texto previo)
                     const match = val.match(/([0-9\.\+\-\*\/\(\)\s]+)$/);
                     if (match && match[1].trim() !== '') {
                         const expr = match[1].trim();
+                        // Asegurar que haya un número y un operador válido
                         if (/[0-9]/.test(expr) && /[\+\-\*\/]/.test(expr)) {
                             const result = new Function('return ' + expr)();
                             ta.value = val + (val.endsWith(' ') ? '' : ' ') + "= " + result;
@@ -1279,6 +1206,7 @@
                     }
                 } catch(err) {}
             },
+
             renderAll: () => {
                 const list = document.getElementById('notes-list');
                 list.innerHTML = '';
@@ -1287,6 +1215,7 @@
                     const colorClass = Notes.colors[note.color] || Notes.colors.yellow;
                     el.className = `relative p-3 rounded-lg border shadow-sm ${colorClass}`;
                     
+                    // Botón "=" agrandado a text-xl y con mayor tamaño (w-6 h-6)
                     el.innerHTML = `
                         <button onclick="Notes.evalMath('${note.id}')" title="Calcular Resultado" class="absolute top-1 right-8 w-6 h-6 flex items-center justify-center text-black/50 hover:text-black hover:bg-black/10 rounded font-black text-xl transition-colors">=</button>
                         <button onclick="Notes.remove('${note.id}')" class="absolute top-1 right-2 w-6 h-6 flex items-center justify-center text-black/50 hover:text-black hover:bg-black/10 rounded transition-colors"><i class="fa-solid fa-times text-sm"></i></button>
@@ -1297,9 +1226,11 @@
                     const ta = el.querySelector('textarea');
                     ta.addEventListener('input', (e) => {
                         let val = e.target.value;
+                        // Evaluación al presionar el símbolo "="
                         if (val.endsWith('=')) {
                             try {
                                 const textBeforeEq = val.slice(0, -1);
+                                // Extrae solo los números y operadores previos al =
                                 const match = textBeforeEq.match(/([0-9\.\+\-\*\/\(\)\s]+)$/);
                                 if (match && match[1].trim() !== '') {
                                     const expr = match[1].trim();
@@ -1318,10 +1249,13 @@
         };
 
         window.Calc = {
-            val: '0', op: null, prev: null,
+            val: '0',
+            op: null,
+            prev: null,
             update: () => { document.getElementById('calc-display').value = Calc.val; },
             num: (n) => { 
-                if(Calc.val === '0' && n !== '.') Calc.val = n; else Calc.val += n; 
+                if(Calc.val === '0' && n !== '.') Calc.val = n; 
+                else Calc.val += n; 
                 Calc.update(); 
             },
             cmd: (c) => { 
@@ -1329,7 +1263,9 @@
                 if(c === 'del') Calc.val = Calc.val.length > 1 ? Calc.val.slice(0, -1) : '0';
                 Calc.update();
             },
-            op: (o) => { Calc.prev = Calc.val; Calc.val = '0'; Calc.op = o; },
+            op: (o) => { 
+                Calc.prev = Calc.val; Calc.val = '0'; Calc.op = o; 
+            },
             eq: () => {
                 if(Calc.prev && Calc.op) {
                     try {
@@ -1341,7 +1277,10 @@
             }
         };
 
-        window.onload = () => { initFirebase(); };
+        window.onload = () => {
+            initFirebase(); // Inicia la conexión, descarga los datos y luego arranca UI.init()
+        };
+
     </script>
 </body>
 </html>
