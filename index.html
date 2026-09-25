@@ -557,8 +557,47 @@
         // ==========================================
         // ESTADO GLOBAL Y PERSISTENCIA
         // ==========================================
+        const INITIAL_TOOLS = [
+            // Fotografías
+            { id: 't_1', name: 'Redimensionar Foto DNI / Carnet', desc: 'Preparar fotos carnet, pasaporte y DNI para impresión.', url: 'https://www.photopea.com', categoryId: 'cat-1', icon: 'fa-solid fa-id-card', favorite: true },
+            { id: 't_2', name: 'Remover Fondo (Remove.bg)', desc: 'Eliminar fondos de fotos de clientes en un clic.', url: 'https://www.remove.bg/es', categoryId: 'cat-1', icon: 'fa-solid fa-scissors', favorite: true },
+            { id: 't_3', name: 'Compresor de Imágenes (TinyPNG)', desc: 'Comprimir JPG y PNG manteniendo la máxima resolución de impresión.', url: 'https://tinypng.com/', categoryId: 'cat-1', icon: 'fa-solid fa-file-image', favorite: false },
+            
+            // Documentos
+            { id: 't_4', name: 'WhatsApp Web Atención', desc: 'Recibir archivos, PDFs y comprobantes de clientes rápidamente.', url: 'https://web.whatsapp.com/', categoryId: 'cat-2', icon: 'fa-brands fa-whatsapp', favorite: true },
+            { id: 't_5', name: 'Google Drive Imprenta', desc: 'Repositorio de archivos pesados y diseños en la nube.', url: 'https://drive.google.com/', categoryId: 'cat-2', icon: 'fa-brands fa-google-drive', favorite: false },
+            
+            // Tamaños y Medidas
+            { id: 't_6', name: 'Calculadora de Escalas y Proporciones', desc: 'Calcular proporciones exactas para gigantografías y ampliaciones.', url: 'https://www.calculator.net/ratio-calculator.html', categoryId: 'cat-3', icon: 'fa-solid fa-ruler-combined', favorite: true },
+            { id: 't_7', name: 'Guía de Medidas ISO de Papel', desc: 'Consulta de dimensiones A4, A3, Folio, Banners y formatos estándar.', url: 'https://www.papersizes.org/', categoryId: 'cat-3', icon: 'fa-solid fa-ruler', favorite: false },
+
+            // Facturas y RUC
+            { id: 't_8', name: 'Consulta RUC - SUNAT', desc: 'Verificar estado de contribuyentes y razón social.', url: 'https://e-consultaruc.sunat.gob.pe/clruc-tm-complex/consRuc.jsp', categoryId: 'cat-4', icon: 'fa-solid fa-building-columns', favorite: true },
+            { id: 't_9', name: 'Portal SUNAT Clave SOL', desc: 'Emisión y gestión de comprobantes fiscales.', url: 'https://www.sunat.gob.pe/', categoryId: 'cat-4', icon: 'fa-solid fa-file-invoice-dollar', favorite: false },
+
+            // Boletas
+            { id: 't_10', name: 'Generador de Cotizaciones / Boletas', desc: 'Crear cotizaciones y notas de venta rápidas para clientes.', url: 'https://www.facturacion.cl/', categoryId: 'cat-5', icon: 'fa-solid fa-receipt', favorite: true },
+            { id: 't_11', name: 'Emisión Boletas Electrónicas', desc: 'Acceso directo a emisión de comprobantes de venta rápida.', url: 'https://www.sunat.gob.pe/', categoryId: 'cat-5', icon: 'fa-solid fa-file-signature', favorite: false },
+
+            // PDF
+            { id: 't_12', name: 'ILovePDF (Suite Completa)', desc: 'Unir, dividir, comprimir y convertir archivos PDF.', url: 'https://www.ilovepdf.com/es', categoryId: 'cat-6', icon: 'fa-solid fa-file-pdf', favorite: true },
+            { id: 't_13', name: 'PDF24 Tools Web', desc: 'Herramientas avanzadas para editar y reparar PDFs dañados.', url: 'https://tools.pdf24.org/es/', categoryId: 'cat-6', icon: 'fa-solid fa-toolbox', favorite: false },
+            { id: 't_14', name: 'Sejda Editor PDF', desc: 'Editar textos, firmar y modificar documentos PDF en línea.', url: 'https://www.sejda.com/es/pdf-editor', categoryId: 'cat-6', icon: 'fa-solid fa-pen-to-square', favorite: false },
+
+            // Impresión y Preprensa
+            { id: 't_15', name: 'Generador Código de Barras', desc: 'Crear códigos EAN-13, CODE128 para etiquetas de productos.', url: 'https://barcode.tec-it.com/es', categoryId: 'cat-7', icon: 'fa-solid fa-barcode', favorite: true },
+            { id: 't_16', name: 'Conversor y Paleta CMYK / RGB', desc: 'Verificar equivalencias de color de pantalla a tinta offset e inyección.', url: 'https://www.colordesigner.io/', categoryId: 'cat-7', icon: 'fa-solid fa-droplet', favorite: false },
+            { id: 't_17', name: 'WhatTheFont (Buscador de Fuentes)', desc: 'Identificar la tipografía usada en una foto o diseño del cliente.', url: 'https://www.myfonts.com/pages/whatthefont', categoryId: 'cat-7', icon: 'fa-solid fa-font', favorite: true },
+
+            // Herramientas y Diseño
+            { id: 't_18', name: 'Photopea (Photoshop Web)', desc: 'Editor completo para archivos .PSD, .AI, .CDR y .PDF.', url: 'https://www.photopea.com', categoryId: 'cat-8', icon: 'fa-solid fa-palette', favorite: true },
+            { id: 't_19', name: 'Canva Web Imprenta', desc: 'Creación rápida de volantes, gigantografías y tarjetas.', url: 'https://www.canva.com', categoryId: 'cat-8', icon: 'fa-solid fa-pen-nib', favorite: true },
+            { id: 't_20', name: 'Vectorizer.ai (Vectorizador)', desc: 'Convertir logos e imágenes de baja calidad a vectores SVG/EPS.', url: 'https://vectorizer.ai/', categoryId: 'cat-8', icon: 'fa-solid fa-bezier-curve', favorite: true },
+            { id: 't_21', name: 'Generador de Códigos QR', desc: 'Generar QR de alta resolución para imprimir en publicidad.', url: 'https://es.qr-code-generator.com/', categoryId: 'cat-8', icon: 'fa-solid fa-qrcode', favorite: false }
+        ];
+
         window.State = {
-            tools: [],
+            tools: [...INITIAL_TOOLS],
             categories: [
                 { id: 'cat-1', name: 'Fotografías', icon: 'fa-camera' },
                 { id: 'cat-2', name: 'Documentos', icon: 'fa-file-lines' },
@@ -569,12 +608,31 @@
                 { id: 'cat-7', name: 'Impresión', icon: 'fa-print' },
                 { id: 'cat-8', name: 'Herramientas', icon: 'fa-screwdriver-wrench' }
             ],
-            notes: [],
-            recents: [],
+            notes: [
+                {
+                    id: 'n_medidas',
+                    text: "📌 MEDIDAS ESTÁNDAR IMPRENTA:\n• Tarjeta de Presentación: 9 x 5 cm\n• Foto DNI: 3.5 x 4.5 cm\n• Foto Carnet: 3 x 4 cm\n• Foto Pasaporte: 3.5 x 4.5 cm\n• A4: 21 x 29.7 cm | A3: 29.7 x 42 cm\n• Oficio / Folio: 21.6 x 33 cm",
+                    color: 'yellow',
+                    date: Date.now()
+                },
+                {
+                    id: 'n_papeles',
+                    text: "💡 GRAMAJES DE PAPEL:\n• Bond 75g / 80g: Copias, trámites, boletas.\n• Couché 150g: Volantes, trípticos, afiches.\n• Couché 300g: Tarjetas de presentación, carátulas.\n• Autoadhesivo / Vinilo: Stickers y etiquetas.",
+                    color: 'blue',
+                    date: Date.now() - 1000
+                },
+                {
+                    id: 'n_formula',
+                    text: "🧮 FÓRMULA DE COTIZACIÓN:\nCosto Papel + Impresión + Acabados = Subtotal\nSubtotal * 1.30 = Precio Venta",
+                    color: 'green',
+                    date: Date.now() - 2000
+                }
+            ],
+            recents: ['t_1', 't_12', 't_18', 't_20'],
             settings: {
                 bgUrl: '', bgOpacity: 50, bgBlur: 0,
                 restoreSession: true, calcType: 'basic', calcUrl: '',
-                alertaUrl: '', alertaZoom: 100, sidebarCollapsed: false
+                alertaUrl: 'https://web.whatsapp.com/', alertaZoom: 100, sidebarCollapsed: false
             },
             session: { currentView: 'home', screenLayout: '1', activeScreens: [ { id: 1, toolId: null } ] }
         };
@@ -753,7 +811,12 @@
                 const data = localStorage.getItem('grafiplot_data');
                 if (data) {
                     try {
-                        StorageDB.applyData(JSON.parse(data));
+                        const parsed = JSON.parse(data);
+                        // Asegurar que si el almacenamiento previo tiene pocas herramientas, se usen/fusionen las precargadas
+                        if (!parsed.tools || parsed.tools.length < 10) {
+                            parsed.tools = [...INITIAL_TOOLS];
+                        }
+                        StorageDB.applyData(parsed);
                     } catch(e) { window.App.loadInitialData(); }
                 } else {
                     window.App.loadInitialData();
@@ -762,10 +825,19 @@
 
             applyData: (parsed) => {
                 if (parsed.tools && Array.isArray(parsed.tools) && parsed.tools.length > 0) {
+                    // Si el usuario tenía pocas herramientas previas, asegurar que incluya las herramientas principales
+                    const existingIds = new Set(parsed.tools.map(t => t.id));
+                    INITIAL_TOOLS.forEach(initTool => {
+                        if (!existingIds.has(initTool.id)) {
+                            parsed.tools.push(initTool);
+                        }
+                    });
                     State.tools = parsed.tools;
+                } else {
+                    State.tools = [...INITIAL_TOOLS];
                 }
                 if (parsed.categories && parsed.categories.length > 0) State.categories = parsed.categories;
-                if (parsed.notes) State.notes = parsed.notes;
+                if (parsed.notes && parsed.notes.length > 0) State.notes = parsed.notes;
                 if (parsed.recents) State.recents = parsed.recents;
                 State.settings = { ...State.settings, ...parsed.settings };
                 if (State.settings.restoreSession && parsed.session) State.session = parsed.session;
@@ -892,7 +964,7 @@
                                     <div id="menu-${tool.id}" class="hidden-safely absolute right-0 mt-2 w-48 rounded-md shadow-lg glass-panel border border-dark-border z-20">
                                         <div class="py-1">
                                             <a href="#" onclick="App.editTool('${tool.id}')" class="block px-4 py-2 text-sm text-white hover:bg-brand-600"><i class="fa-solid fa-pen w-5"></i> Editar</a>
-                                            <a href="#" onclick="App.openToolExternal('${tool.url}')" class="block px-4 py-2 text-sm text-white hover:bg-brand-600"><i class="fa-solid fa-external-link w-5"></i> Abrir en navegador</a>
+                                            <a href="#" onclick="App.openToolExternal('${tool.url}', '${tool.id}')" class="block px-4 py-2 text-sm text-white hover:bg-brand-600"><i class="fa-solid fa-external-link w-5"></i> Abrir en navegador</a>
                                             <a href="#" onclick="App.deleteTool('${tool.id}')" class="block px-4 py-2 text-sm text-red-400 hover:bg-red-500 hover:text-white"><i class="fa-solid fa-trash w-5"></i> Eliminar</a>
                                         </div>
                                     </div>
@@ -999,7 +1071,7 @@
                                         </div>
                                         <div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
                                             <button onclick="document.getElementById('frame-${screen.id}').src = '${tool.url}'" class="iframe-btn" title="Recargar"><i class="fa-solid fa-rotate-right"></i></button>
-                                            <button onclick="App.openToolExternal('${tool.url}')" class="iframe-btn" title="Abrir externamente"><i class="fa-solid fa-external-link"></i></button>
+                                            <button onclick="App.openToolExternal('${tool.url}', '${tool.id}')" class="iframe-btn" title="Abrir externamente"><i class="fa-solid fa-external-link"></i></button>
                                             <button onclick="App.expandScreen(${screen.id})" class="iframe-btn text-brand-400" title="Expandir"><i class="fa-solid fa-expand"></i></button>
                                             <button onclick="App.closeScreenTool(${screen.id})" class="iframe-btn text-red-400 hover:text-red-300" title="Cerrar"><i class="fa-solid fa-times"></i></button>
                                         </div>
@@ -1380,12 +1452,7 @@
             },
             
             loadInitialData: () => {
-                State.tools = [
-                    { id: 't_1', name: 'Redimensionar DNI', desc: 'Preparar fotografías para imprimir en tamaño DNI.', url: 'https://photopea.com', categoryId: 'cat-1', icon: 'fa-id-card', favorite: true },
-                    { id: 't_2', name: 'Herramientas PDF', desc: 'Unir, dividir y comprimir PDF.', url: 'https://www.ilovepdf.com/es', categoryId: 'cat-6', icon: 'fa-file-pdf', favorite: true },
-                    { id: 't_3', name: 'Generador Boletas', desc: 'Sistema web para generar boletas.', url: 'https://google.com', categoryId: 'cat-5', icon: 'fa-receipt', favorite: false },
-                    { id: 't_4', name: 'Calculadora Tamaños', desc: 'Calcular proporciones de impresión.', url: 'https://www.calculator.net/ratio-calculator.html', categoryId: 'cat-3', icon: 'fa-ruler', favorite: false }
-                ];
+                State.tools = [...INITIAL_TOOLS];
                 StorageDB.save();
             },
 
@@ -1471,8 +1538,9 @@
                 UI.renderWorkspaceScreens();
             },
 
-            openToolExternal: (url) => {
-                window.open(url, '_blank');
+            openToolExternal: (url, toolId) => {
+                const targetName = toolId ? 'grafiplot_win_' + toolId.replace(/[^a-zA-Z0-9_]/g, '_') : 'grafiplot_external_tab';
+                window.open(url, targetName);
             },
 
             closeScreenTool: (screenId) => {
