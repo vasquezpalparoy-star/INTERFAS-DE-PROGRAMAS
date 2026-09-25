@@ -40,8 +40,18 @@
         .tool-card { transition: all 0.2s ease-out; }
         .tool-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); border-color: #e6192b; }
         
-        /* Grid dinámico para multipantalla */
-        .workspace-grid { display: grid; gap: 0.5rem; height: 100%; width: 100%; transition: all 0.3s; }
+        /* Sidebar colapsable */
+        #main-sidebar {
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+        }
+        #main-sidebar.collapsed {
+            margin-left: -16rem; /* -64 en Tailwind (256px) */
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Grid dinámico optimizado para máximo espacio */
+        .workspace-grid { display: grid; gap: 4px; height: 100%; width: 100%; transition: all 0.3s; }
         .grid-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
         .grid-2h { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
         .grid-2v { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
@@ -55,15 +65,25 @@
         .grid-7 { grid-template-columns: 1fr 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
         .grid-8 { grid-template-columns: 1fr 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
 
-        .iframe-container { display: flex; flex-direction: column; height: 100%; background: #fff; border-radius: 0.5rem; overflow: hidden; position: relative; }
+        .iframe-container { display: flex; flex-direction: column; height: 100%; width: 100%; background: #fff; border-radius: 0.375rem; overflow: hidden; position: relative; }
         .iframe-container iframe { flex-grow: 1; border: none; width: 100%; height: 100%; background: #fff;}
-        .iframe-header { background: #f1f5f9; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid #e2e8f0; color: #1e293b; font-size: 0.875rem; }
-        .dark .iframe-header { background: #0f172a; border-bottom-color: #334155; color: #e2e8f0; }
-        .iframe-btn { padding: 0.25rem; border-radius: 0.25rem; cursor: pointer; transition: background 0.2s; }
-        .iframe-btn:hover { background: rgba(128,128,128,0.2); }
+        .iframe-header { background: #1e293b; padding: 0.2rem 0.5rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; border-bottom: 1px solid #334155; color: #e2e8f0; font-size: 0.75rem; height: 28px; shrink: 0; }
+        .iframe-btn { padding: 0.2rem 0.35rem; border-radius: 0.25rem; cursor: pointer; transition: background 0.2s; font-size: 0.75rem; }
+        .iframe-btn:hover { background: rgba(255,255,255,0.15); }
 
         #custom-bg { position: fixed; inset: 0; z-index: -2; background-size: cover; background-position: center; transition: all 0.3s; }
         #bg-overlay { position: fixed; inset: 0; z-index: -1; background: linear-gradient(to bottom right, rgba(15,23,42,0.9), rgba(15,23,42,0.95)); transition: all 0.3s; }
+
+        /* Botón de salida para modo full-workspace */
+        #exit-compact-topbar {
+            position: fixed;
+            top: 6px;
+            right: 6px;
+            z-index: 90;
+            opacity: 0.3;
+            transition: opacity 0.2s;
+        }
+        #exit-compact-topbar:hover { opacity: 1; }
 
         /* Utilidades para Drag & Drop y modals */
         .dragging { opacity: 0.5; }
@@ -76,11 +96,15 @@
     <div id="custom-bg"></div>
     <div id="bg-overlay"></div>
 
-    <aside class="w-64 h-full glass-panel flex flex-col border-r border-dark-border shadow-xl z-10 shrink-0">
-        <div class="p-5 border-b border-dark-border flex items-center justify-center bg-black/20">
-            <h1 class="font-bold text-4xl tracking-tighter select-none" style="font-family: Arial, Helvetica, sans-serif;">
+    <!-- Barra Lateral de Categorías e Inicio (Ocultable) -->
+    <aside id="main-sidebar" class="w-64 h-full glass-panel flex flex-col border-r border-dark-border shadow-xl z-20 shrink-0">
+        <div class="p-4 border-b border-dark-border flex items-center justify-between bg-black/20">
+            <h1 class="font-bold text-3xl tracking-tighter select-none" style="font-family: Arial, Helvetica, sans-serif;">
                 <span class="text-brand-500">G</span><span class="text-white">rafiplot</span>
             </h1>
+            <button onclick="UI.toggleSidebar()" class="text-dark-muted hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10" title="Ocultar Menú (Ctrl+B)">
+                <i class="fa-solid fa-chevron-left text-sm"></i>
+            </button>
         </div>
 
         <div class="flex-1 overflow-y-auto p-3 flex flex-col gap-1" id="sidebar-menu">
@@ -95,7 +119,10 @@
             </button>
 
             <div class="mt-4 mb-2 px-2 text-xs font-semibold text-dark-muted uppercase tracking-wider flex justify-between items-center">
-                Categorías
+                <span>Categorías</span>
+                <button onclick="UI.openManageCategoriesModal()" class="text-xs text-brand-400 hover:text-white transition-colors p-1" title="Gestionar Categorías">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
             </div>
             <div id="categories-list" class="flex flex-col gap-1">
                 <!-- Se llenan por JS -->
@@ -109,50 +136,67 @@
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-full relative">
-        <!-- Topbar -->
-        <header class="h-14 glass-panel border-b border-dark-border flex items-center justify-between px-4 z-10 shrink-0">
-            
-            <div class="flex-1 flex items-center gap-4">
+    <main class="flex-1 flex flex-col h-full w-full relative overflow-hidden">
+        <!-- Topbar Superior -->
+        <header id="main-topbar" class="h-13 glass-panel border-b border-dark-border flex items-center justify-between px-3 z-10 shrink-0">
+            <div class="flex items-center gap-2">
+                <!-- Botón de Ocultar/Mostrar Menú Sidebar -->
+                <button onclick="UI.toggleSidebar()" class="w-9 h-9 rounded-lg flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 transition-colors mr-1" title="Ocultar/Mostrar Menú (Ctrl+B)">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+
                 <!-- Buscador -->
-                <div class="relative w-64 md:w-96 group">
-                    <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-dark-muted group-focus-within:text-brand-500 transition-colors"></i>
-                    <input type="text" id="global-search" placeholder="Buscar herramienta (Ctrl+K)..." class="w-full h-9 pl-9 pr-4 rounded-full glass-input text-sm transition-all focus:w-full">
+                <div class="relative w-52 md:w-80 group">
+                    <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-dark-muted group-focus-within:text-brand-500 transition-colors text-xs"></i>
+                    <input type="text" id="global-search" placeholder="Buscar herramienta (Ctrl+K)..." class="w-full h-8 pl-8 pr-3 rounded-full glass-input text-xs transition-all">
                 </div>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5">
                 <!-- Selector de Multipantalla -->
-                <div class="flex items-center bg-dark-bg/50 rounded-lg p-1 border border-dark-border mr-2">
-                    <i class="fa-solid fa-border-all text-dark-muted text-xs mx-2"></i>
-                    <select id="screen-selector" class="bg-transparent text-white text-sm font-bold outline-none cursor-pointer pr-2">
+                <div class="flex items-center bg-dark-bg/50 rounded-lg p-1 border border-dark-border mr-1">
+                    <i class="fa-solid fa-border-all text-dark-muted text-xs mx-1.5"></i>
+                    <select id="screen-selector" class="bg-transparent text-white text-xs font-bold outline-none cursor-pointer pr-1">
                         <option value="1" class="text-black">1 Pantalla</option>
-                        <option value="2h" class="text-black">2 Pantallas (Columnas)</option>
+                        <option value="2h" class="text-black">2 Pantallas (Cols)</option>
                         <option value="2v" class="text-black">2 Pantallas (Filas)</option>
-                        <option value="3h" class="text-black">3 Pantallas (Columnas)</option>
+                        <option value="3h" class="text-black">3 Pantallas (Cols)</option>
                         <option value="3v" class="text-black">3 Pantallas (Filas)</option>
                         <option value="4" class="text-black">4 Pantallas (Cuadrícula)</option>
-                        <option value="4h" class="text-black">4 Pantallas (Columnas)</option>
+                        <option value="4h" class="text-black">4 Pantallas (Cols)</option>
                         <option value="4v" class="text-black">4 Pantallas (Filas)</option>
                         <option value="6" class="text-black">6 Pantallas (Cuadrícula)</option>
                         <option value="8" class="text-black">8 Pantallas (Cuadrícula)</option>
                     </select>
                 </div>
 
-                <button onclick="UI.openSettings(); document.querySelector('[data-target=\'set-sync\']').click();" class="w-9 h-9 rounded-full flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 transition-colors tooltip" title="Conectando a Firebase...">
-                    <i id="firebase-status-icon-top" class="fa-solid fa-cloud text-gray-500"></i>
+                <!-- Botón de Máximo Espacio (Ocultar Barra Superior) -->
+                <button onclick="UI.toggleFullWorkspaceMode()" class="w-8 h-8 rounded-lg flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 transition-colors tooltip" title="Maximizar Espacio (Ocultar Encabezado)">
+                    <i id="full-workspace-icon" class="fa-solid fa-expand text-xs"></i>
                 </button>
-                <button onclick="UI.toggleNotes()" class="w-9 h-9 rounded-full flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 transition-colors tooltip" title="Notas Rápidas">
-                    <i class="fa-solid fa-note-sticky text-yellow-500"></i>
+
+                <button onclick="UI.openSettings(); document.querySelector('[data-target=\'set-sync\']').click();" class="w-8 h-8 rounded-lg flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 transition-colors tooltip" title="Estado de Sincronización">
+                    <i id="firebase-status-icon-top" class="fa-solid fa-cloud text-gray-500 text-xs"></i>
                 </button>
-                <button onclick="UI.toggleCalculator()" class="w-9 h-9 rounded-full flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 transition-colors tooltip" title="Calculadora">
-                    <i class="fa-solid fa-calculator text-blue-400"></i>
+                <button onclick="UI.toggleAlertaClientes()" class="w-8 h-8 rounded-lg flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 transition-colors tooltip" title="Alerta Clientes">
+                    <i class="fa-solid fa-bell text-red-500 text-xs"></i>
                 </button>
-                <button onclick="UI.openAddToolModal()" class="ml-2 px-4 h-9 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-sm font-medium flex items-center gap-2 shadow-lg shadow-brand-500/20 transition-all">
-                    <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Agregar</span>
+                <button onclick="UI.toggleNotes()" class="w-8 h-8 rounded-lg flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 transition-colors tooltip" title="Notas Rápidas">
+                    <i class="fa-solid fa-note-sticky text-yellow-500 text-xs"></i>
+                </button>
+                <button onclick="UI.toggleCalculator()" class="w-8 h-8 rounded-lg flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 transition-colors tooltip" title="Calculadora">
+                    <i class="fa-solid fa-calculator text-blue-400 text-xs"></i>
+                </button>
+                <button onclick="UI.openAddToolModal()" class="ml-1 px-3 h-8 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 shadow-lg shadow-brand-500/20 transition-all">
+                    <i class="fa-solid fa-plus text-xs"></i> <span class="hidden sm:inline">Agregar</span>
                 </button>
             </div>
         </header>
+
+        <!-- Botón flotante para restaurar encabezado si está oculto -->
+        <button id="exit-compact-topbar" onclick="UI.toggleFullWorkspaceMode()" class="hidden-safely p-2 bg-black/70 hover:bg-brand-600 text-white rounded-full shadow-2xl border border-white/20 transition-all" title="Mostrar Barra Superior">
+            <i class="fa-solid fa-compress text-xs"></i>
+        </button>
 
         <!-- Vista Dashboard (Tarjetas) -->
         <div id="view-dashboard" class="flex-1 overflow-y-auto p-6">
@@ -170,13 +214,61 @@
             </div>
         </div>
 
-        <!-- Vista Workspace (Multipantalla Iframes) -->
-        <div id="view-workspace" class="flex-1 p-2 hidden-safely bg-dark-bg/80">
+        <!-- Vista Workspace (Multipantalla Iframes Maximizadas) -->
+        <div id="view-workspace" class="flex-1 p-1 hidden-safely bg-dark-bg/90 h-full w-full overflow-hidden">
             <div id="workspace-grid" class="workspace-grid grid-1">
                 <!-- Paneles generados por JS -->
             </div>
         </div>
     </main>
+
+    <!-- Panel Alerta Clientes (Pantalla Flotante) -->
+    <div id="alerta-panel" class="hidden-safely fixed left-72 top-20 w-96 h-[520px] glass-panel shadow-2xl rounded-xl border border-dark-border flex flex-col z-50 overflow-hidden resize">
+        <div class="p-2.5 border-b border-dark-border flex justify-between items-center cursor-move bg-dark-panel select-none" id="alerta-header">
+            <h3 class="font-bold text-white text-sm flex items-center gap-2">
+                <i class="fa-solid fa-bell text-red-500 animate-pulse"></i> Alerta Clientes
+            </h3>
+            <div class="flex items-center gap-1">
+                <div class="flex items-center bg-black/40 rounded px-1.5 py-0.5 text-xs border border-white/10 mr-1 gap-1">
+                    <button onclick="UI.zoomAlerta(-10)" class="w-5 h-5 flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 rounded transition-colors" title="Reducir vista (-10%)">
+                        <i class="fa-solid fa-minus text-[10px]"></i>
+                    </button>
+                    <span id="alerta-zoom-level" onclick="UI.resetAlertaZoom()" class="px-1 text-[11px] font-mono font-semibold text-gray-300 hover:text-brand-400 cursor-pointer select-none" title="Clic para restablecer a 100%">100%</span>
+                    <button onclick="UI.zoomAlerta(10)" class="w-5 h-5 flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 rounded transition-colors" title="Aumentar vista (+10%)">
+                        <i class="fa-solid fa-plus text-[10px]"></i>
+                    </button>
+                </div>
+                <button onclick="UI.promptAlertaUrl()" class="w-6 h-6 rounded flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 transition-colors" title="Cambiar enlace de Alerta Clientes">
+                    <i class="fa-solid fa-link text-xs"></i>
+                </button>
+                <button onclick="UI.toggleAlertaClientes()" class="w-6 h-6 rounded flex items-center justify-center text-dark-muted hover:text-white hover:bg-white/10 transition-colors">
+                    <i class="fa-solid fa-times text-xs"></i>
+                </button>
+            </div>
+        </div>
+        <div id="alerta-body" class="flex-1 bg-dark-bg/90 relative flex flex-col overflow-hidden">
+            <!-- Contenido dinámico -->
+        </div>
+    </div>
+
+    <!-- Modal Gestionar Categorías -->
+    <div id="modal-categories" class="hidden-safely fixed inset-0 z-[100] flex items-center justify-center modal-overlay">
+        <div class="bg-dark-panel w-full max-w-lg rounded-2xl shadow-2xl border border-dark-border flex flex-col max-h-[85vh]">
+            <div class="p-4 border-b border-dark-border flex justify-between items-center">
+                <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-tags text-brand-500 mr-2"></i> Gestionar Categorías</h2>
+                <button onclick="UI.closeModals()" class="text-dark-muted hover:text-white"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1 space-y-3" id="categories-manage-list">
+                <!-- Se llena dinámicamente -->
+            </div>
+            <div class="p-4 border-t border-dark-border bg-black/20 rounded-b-2xl flex justify-between items-center">
+                <button onclick="App.addCategory()" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-plus text-brand-400"></i> Nueva Categoría
+                </button>
+                <button onclick="UI.closeModals()" class="px-5 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-sm font-medium shadow-lg transition-colors">Guardar y Cerrar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Panel de Notas -->
     <div id="notes-panel" class="hidden-safely fixed right-4 top-20 w-80 h-[500px] glass-panel shadow-2xl rounded-xl border border-dark-border flex flex-col z-50 transform transition-transform">
@@ -202,7 +294,7 @@
             <button onclick="UI.toggleCalculator()" class="text-dark-muted hover:text-white"><i class="fa-solid fa-times"></i></button>
         </div>
         <div id="calc-content" class="p-0 h-[400px]">
-             <!-- Se llena con un iframe o html simple -->
+             <!-- Se llena dinámicamente -->
         </div>
     </div>
 
@@ -324,11 +416,42 @@
                             </label>
                         </div>
                         
-                        <h3 class="text-md font-bold text-white mb-2">Sincronización Firebase</h3>
-                        <p class="text-xs text-dark-muted mb-4">La configuración de Firebase ya está integrada. La sincronización se realiza en segundo plano automáticamente.</p>
-                        <div class="p-3 bg-green-900/20 border border-green-500/30 rounded-lg flex items-center gap-3">
-                            <div id="sync-status-icon" class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></div>
-                            <span id="sync-status-text" class="text-sm text-green-400 font-medium">Sincronización Activa</span>
+                        <h3 class="text-md font-bold text-white mb-2">Modo de Almacenamiento y Sincronización</h3>
+                        <div class="mb-4 space-y-2">
+                            <label class="block text-xs font-medium text-dark-muted">Modo de Operación</label>
+                            <select id="setting-sync-mode" onchange="StorageDB.toggleSyncMode(this.value)" class="w-full rounded-lg glass-input p-2.5 text-sm bg-dark-bg">
+                                <option value="local">💾 Almacenamiento Local (Prioridad Principal - Autoguardado Instantáneo)</option>
+                                <option value="cloud">🔥 Nube Firebase (Sincronización Opcional)</option>
+                            </select>
+                        </div>
+
+                        <div id="cloud-settings-container">
+                            <p class="text-xs text-dark-muted mb-4">Usa la misma clave en todos tus dispositivos para compartir tus herramientas y notas en tiempo real.</p>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-dark-muted mb-1">Clave de Sincronización (ID de Espacio)</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="setting-sync-key" class="flex-1 rounded-lg glass-input p-2.5 text-sm font-mono" placeholder="grafiplot_mi_espacio">
+                                        <button onclick="StorageDB.changeSyncKey()" class="px-3 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-medium transition-colors">
+                                            Cambiar / Conectar
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 bg-black/30 border border-dark-border rounded-lg space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <div id="sync-status-icon" class="w-2.5 h-2.5 rounded-full bg-gray-500"></div>
+                                            <span id="sync-status-text" class="text-xs text-white font-medium">Conectando...</span>
+                                        </div>
+                                        <button onclick="StorageDB.save()" class="text-xs text-brand-400 hover:underline">
+                                            <i class="fa-solid fa-sync mr-1"></i> Forzar Guardado
+                                        </button>
+                                    </div>
+                                    <div id="sync-debug-msg" class="text-[11px] text-dark-muted font-mono truncate">Iniciando sistema...</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -362,12 +485,14 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'grafiplot-hub';
+        
         let firebaseConfig = { 
             apiKey: "AIzaSyCtWCZsLoGQp-zEPUwSAUOfAZ5U7qTy2MM",
             authDomain: "roy-interfas.firebaseapp.com",
+            databaseURL: "https://roy-interfas-default-rtdb.firebaseio.com",
             projectId: "roy-interfas",
             storageBucket: "roy-interfas.firebasestorage.app",
             messagingSenderId: "625676251815",
@@ -376,61 +501,57 @@
         
         try {
             if (typeof __firebase_config !== 'undefined') {
-                firebaseConfig = JSON.parse(__firebase_config);
+                firebaseConfig = { ...firebaseConfig, ...JSON.parse(__firebase_config) };
             }
-        } catch(e) { console.warn("Usando config local para Firebase"); }
+        } catch(e) { console.warn("Usando configuración predeterminada de Firebase"); }
 
-        let db, auth, userId;
+        let db, auth;
         let isFirebaseInitialized = false;
+        let unsubscribeFirebase = null;
+        let isLocalOnly = localStorage.getItem('grafiplot_sync_mode') !== 'cloud';
+        let isUIInitialized = false;
+
+        let syncKey = localStorage.getItem('grafiplot_sync_key');
+        if (!syncKey) {
+            syncKey = 'espacio_' + Math.random().toString(36).substring(2, 8);
+            localStorage.setItem('grafiplot_sync_key', syncKey);
+        }
 
         async function initFirebase() {
+            StorageDB.loadLocalFallback();
+            if (!isUIInitialized) {
+                UI.init();
+                isUIInitialized = true;
+            }
+
+            if (isLocalOnly) {
+                StorageDB.updateSyncUIStatus('success_local', 'Autoguardado Local Activo', 'Notas y datos protegidos en tu navegador en tiempo real.');
+                return;
+            }
+
+            StorageDB.updateSyncUIStatus('saving', 'Conectando a Firebase...', `Conectando espacio: ${syncKey}`);
+
             try {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                if (typeof __initial_auth_token !== 'undefined') {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch(authErr) {
+                    console.warn("Autenticación Firebase en modo anónimo:", authErr.message);
                 }
-
-                userId = auth.currentUser?.uid;
-                if (!userId) throw new Error("ID de usuario no encontrado.");
 
                 isFirebaseInitialized = true;
-                console.log("Firebase conectado correctamente. Usuario:", userId);
-                
-                // Actualizar interfaz con estado de conexión
-                const iconTop = document.getElementById('firebase-status-icon-top');
-                if (iconTop) {
-                    iconTop.className = 'fa-solid fa-cloud text-green-500';
-                    iconTop.parentElement.title = "Sincronizado en la Nube";
-                }
-                const syncIcon = document.getElementById('sync-status-icon');
-                if (syncIcon) syncIcon.className = 'w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]';
-                const syncText = document.getElementById('sync-status-text');
-                if (syncText) syncText.textContent = 'Sincronización Activa';
-
-                await StorageDB.loadFromFirebase();
+                StorageDB.listenToFirebase();
             } catch (e) {
-                console.warn("Trabajando en modo local por error de conexión.", e);
-                
-                // Mostrar error visualmente en la interfaz
-                const iconTop = document.getElementById('firebase-status-icon-top');
-                if (iconTop) {
-                    iconTop.className = 'fa-solid fa-cloud-xmark text-red-500';
-                    iconTop.parentElement.title = "Error Firebase: " + e.message;
-                }
-                const syncIcon = document.getElementById('sync-status-icon');
-                if (syncIcon) syncIcon.className = 'w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]';
-                const syncText = document.getElementById('sync-status-text');
-                if (syncText) syncText.textContent = 'Error: ' + e.message;
-
-                StorageDB.loadLocalFallback();
+                console.warn("Firebase no disponible, usando almacenamiento local:", e.message);
+                StorageDB.updateSyncUIStatus('success_local', 'Autoguardado Local Activo', 'Firebase offline. Operando con guardado local instantáneo.');
             }
-            // Iniciar UI después de tener los datos listos
-            UI.init();
         }
 
         // ==========================================
@@ -452,13 +573,145 @@
             recents: [],
             settings: {
                 bgUrl: '', bgOpacity: 50, bgBlur: 0,
-                restoreSession: true, calcType: 'basic', calcUrl: ''
+                restoreSession: true, calcType: 'basic', calcUrl: '',
+                alertaUrl: '', alertaZoom: 100, sidebarCollapsed: false
             },
             session: { currentView: 'home', screenLayout: '1', activeScreens: [ { id: 1, toolId: null } ] }
         };
 
         window.StorageDB = {
             saveTimeout: null,
+
+            getDocRef: () => {
+                if (!db) return null;
+                return doc(db, 'artifacts', appId, 'public', 'data', 'workspaces', syncKey);
+            },
+
+            toggleSyncMode: (mode) => {
+                isLocalOnly = (mode === 'local');
+                localStorage.setItem('grafiplot_sync_mode', mode);
+                const container = document.getElementById('cloud-settings-container');
+                if (container) container.style.display = isLocalOnly ? 'none' : 'block';
+
+                if (isLocalOnly) {
+                    if (unsubscribeFirebase) {
+                        unsubscribeFirebase();
+                        unsubscribeFirebase = null;
+                    }
+                    StorageDB.updateSyncUIStatus('error', 'Modo Solo Local', 'Datos almacenados localmente en este navegador.');
+                } else {
+                    if (!isFirebaseInitialized) {
+                        initFirebase();
+                    } else {
+                        StorageDB.listenToFirebase();
+                        StorageDB.save();
+                    }
+                }
+            },
+
+            updateSyncUIStatus: (type, text, debugMsg = '') => {
+                const iconTop = document.getElementById('firebase-status-icon-top');
+                const syncText = document.getElementById('sync-status-text');
+                const syncIcon = document.getElementById('sync-status-icon');
+                const debugEl = document.getElementById('sync-debug-msg');
+
+                if (debugEl && debugMsg) debugEl.textContent = debugMsg;
+
+                if (type === 'success_local') {
+                    if (iconTop) {
+                        iconTop.className = 'fa-solid fa-floppy-disk text-emerald-400 text-xs';
+                        iconTop.parentElement.title = "Guardado Local Activo (Instantáneo)";
+                    }
+                    if (syncIcon) syncIcon.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]';
+                    if (syncText) { syncText.textContent = text; syncText.className = 'text-xs text-emerald-400 font-medium'; }
+                } else if (type === 'success') {
+                    if (iconTop) {
+                        iconTop.className = 'fa-solid fa-cloud text-green-500 text-xs';
+                        iconTop.parentElement.title = `Firebase Activo (${syncKey})`;
+                    }
+                    if (syncIcon) syncIcon.className = 'w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]';
+                    if (syncText) { syncText.textContent = text; syncText.className = 'text-xs text-green-400 font-medium'; }
+                } else if (type === 'saving') {
+                    if (iconTop) {
+                        iconTop.className = 'fa-solid fa-floppy-disk text-yellow-400 animate-pulse text-xs';
+                        iconTop.parentElement.title = "Guardando cambios...";
+                    }
+                    if (syncIcon) syncIcon.className = 'w-2.5 h-2.5 rounded-full bg-yellow-400 shadow-[0_0_8px_#facc15]';
+                    if (syncText) { syncText.textContent = text; syncText.className = 'text-xs text-yellow-400 font-medium'; }
+                } else if (type === 'error') {
+                    if (iconTop) {
+                        iconTop.className = 'fa-solid fa-database text-amber-400 text-xs';
+                        iconTop.parentElement.title = "Modo Respaldo Local";
+                    }
+                    if (syncIcon) syncIcon.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_#f59e0b]';
+                    if (syncText) { syncText.textContent = text; syncText.className = 'text-xs text-amber-400 font-medium'; }
+                }
+            },
+
+            changeSyncKey: () => {
+                const input = document.getElementById('setting-sync-key');
+                if (!input || !input.value.trim()) return;
+                const newKey = input.value.trim();
+                
+                syncKey = newKey;
+                localStorage.setItem('grafiplot_sync_key', syncKey);
+                
+                StorageDB.listenToFirebase();
+                StorageDB.save();
+            },
+
+            listenToFirebase: () => {
+                if (!isFirebaseInitialized || isLocalOnly) return;
+                
+                const docRef = StorageDB.getDocRef();
+                if (!docRef) return;
+
+                if (unsubscribeFirebase) unsubscribeFirebase();
+
+                StorageDB.updateSyncUIStatus('saving', 'Cargando Firebase...', `Obteniendo datos de: ${syncKey}`);
+
+                unsubscribeFirebase = onSnapshot(docRef, (snap) => {
+                    if (snap.exists()) {
+                        const cloudData = snap.data();
+                        localStorage.setItem('grafiplot_data', JSON.stringify(cloudData));
+                        StorageDB.applyData(cloudData);
+                        
+                        if (!isUIInitialized) {
+                            UI.init();
+                            isUIInitialized = true;
+                        } else {
+                            UI.renderCategories();
+                            UI.applySettings();
+                            if (document.getElementById('view-workspace').classList.contains('hidden-safely')) {
+                                UI.renderToolsGrid(State.session.currentView);
+                            } else {
+                                UI.renderWorkspaceScreens();
+                            }
+                            Notes.renderAll();
+                            UI.initCalculator();
+                        }
+                        
+                        StorageDB.updateSyncUIStatus('success', 'Firebase Sincronizado', `Última sincronización: ${new Date().toLocaleTimeString()}`);
+                    } else {
+                        console.log("Creando espacio prioritario en Firebase:", syncKey);
+                        StorageDB.loadLocalFallback();
+                        if (!isUIInitialized) {
+                            UI.init();
+                            isUIInitialized = true;
+                        }
+                        StorageDB.save();
+                    }
+                }, (error) => {
+                    console.warn("Aviso Firebase:", error.message);
+                    if (!isUIInitialized) {
+                        StorageDB.loadLocalFallback();
+                        UI.init();
+                        isUIInitialized = true;
+                    }
+                    StorageDB.updateSyncUIStatus('error', 'Modo Local (Respaldo)', `Operando con respaldo local. (${error.message})`);
+                });
+            },
+
             save: () => {
                 const dataObj = {
                     tools: State.tools,
@@ -470,74 +723,32 @@
                     lastUpdate: Date.now()
                 };
                 
-                // 1. Guardar localmente (Instantáneo)
                 localStorage.setItem('grafiplot_data', JSON.stringify(dataObj));
                 
-                // 2. Sincronizar con la nube (Firestore) con sistema anticolapso (Debounce)
-                if (isFirebaseInitialized && userId) {
-                    const iconTop = document.getElementById('firebase-status-icon-top');
-                    const syncText = document.getElementById('sync-status-text');
-                    const syncIcon = document.getElementById('sync-status-icon');
-                    
-                    // Dar feedback visual INMEDIATO al usuario de que la app detectó el cambio
-                    if(iconTop) { 
-                        iconTop.className = 'fa-solid fa-cloud-arrow-up text-yellow-400 animate-pulse'; 
-                        iconTop.parentElement.title = "Guardando en la nube..."; 
-                    }
-                    if(syncText) syncText.textContent = 'Guardando cambios...';
-                    if(syncIcon) syncIcon.className = 'w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_8px_#facc15]';
+                if (isLocalOnly) {
+                    StorageDB.updateSyncUIStatus('success_local', 'Guardado Local Activo', `Último cambio guardado: ${new Date().toLocaleTimeString()}`);
+                    return;
+                }
 
-                    // Limpiar intentos anteriores para no saturar la base de datos al escribir rápido
+                if (isFirebaseInitialized) {
+                    const docRef = StorageDB.getDocRef();
+                    if (!docRef) return;
+
+                    StorageDB.updateSyncUIStatus('saving', 'Sincronizando Nube...');
+
                     clearTimeout(StorageDB.saveTimeout);
-                    
-                    // Ejecutar guardado final a Firebase tras 600ms de inactividad
                     StorageDB.saveTimeout = setTimeout(async () => {
                         try {
-                            const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'master');
                             await setDoc(docRef, dataObj);
-                            
-                            // Feedback de éxito
-                            if(iconTop) { 
-                                iconTop.className = 'fa-solid fa-check text-green-400'; 
-                                iconTop.parentElement.title = "Guardado con éxito"; 
-                            }
-                            if(syncText) syncText.textContent = 'Sincronizado';
-                            if(syncIcon) syncIcon.className = 'w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]';
-                            
-                            // Restaurar el icono de la nube estándar tras 2 segundos
-                            setTimeout(() => {
-                                if(iconTop && iconTop.classList.contains('fa-check')) {
-                                    iconTop.className = 'fa-solid fa-cloud text-green-500 transition-colors duration-500';
-                                }
-                            }, 2000);
+                            StorageDB.updateSyncUIStatus('success', 'Firebase Sincronizado', `Sincronizado a las ${new Date().toLocaleTimeString()}`);
                         } catch(e) { 
-                            console.error("Fallo al guardar en la nube:", e); 
-                            if(iconTop) { 
-                                iconTop.className = 'fa-solid fa-cloud-xmark text-red-500'; 
-                                iconTop.parentElement.title = "Error al guardar: " + e.message; 
-                            }
-                            if(syncText) syncText.textContent = 'Error al sincronizar';
-                            if(syncIcon) syncIcon.className = 'w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]';
+                            console.warn("Error guardando en nube, respaldado localmente:", e.message); 
+                            StorageDB.updateSyncUIStatus('success_local', 'Guardado Localmente', 'Cambios guardados localmente.');
                         }
-                    }, 600); // 600 milisegundos de agrupación
+                    }, 400);
                 }
             },
-            loadFromFirebase: async () => {
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'master');
-                    const snap = await getDoc(docRef);
-                    if (snap.exists()) {
-                        StorageDB.applyData(snap.data());
-                    } else {
-                        // Si la nube está vacía, intentamos cargar de local y luego subimos a la nube
-                        StorageDB.loadLocalFallback();
-                        StorageDB.save(); 
-                    }
-                } catch(e) {
-                    console.error("Fallo al recuperar datos de la nube:", e);
-                    StorageDB.loadLocalFallback();
-                }
-            },
+
             loadLocalFallback: () => {
                 const data = localStorage.getItem('grafiplot_data');
                 if (data) {
@@ -548,22 +759,34 @@
                     window.App.loadInitialData();
                 }
             },
+
             applyData: (parsed) => {
-                State.tools = parsed.tools || [];
+                if (parsed.tools && Array.isArray(parsed.tools) && parsed.tools.length > 0) {
+                    State.tools = parsed.tools;
+                }
                 if (parsed.categories && parsed.categories.length > 0) State.categories = parsed.categories;
-                State.notes = parsed.notes || [];
-                State.recents = parsed.recents || [];
+                if (parsed.notes) State.notes = parsed.notes;
+                if (parsed.recents) State.recents = parsed.recents;
                 State.settings = { ...State.settings, ...parsed.settings };
-                if (State.settings.restoreSession) State.session = parsed.session || State.session;
+                if (State.settings.restoreSession && parsed.session) State.session = parsed.session;
             }
         };
 
         window.UI = {
             init: () => {
+                const inputSyncKey = document.getElementById('setting-sync-key');
+                if (inputSyncKey) inputSyncKey.value = syncKey;
+
                 UI.renderCategories();
                 UI.applySettings();
                 UI.setupEventListeners();
                 
+                // Restaurar estado de la barra lateral
+                if (State.settings.sidebarCollapsed) {
+                    const sidebar = document.getElementById('main-sidebar');
+                    if (sidebar) sidebar.classList.add('collapsed');
+                }
+
                 if(State.session.activeScreens.some(s => s.toolId)) {
                     document.getElementById('screen-selector').value = State.session.screenLayout || '1';
                     UI.updateWorkspaceGrid(State.session.screenLayout || '1');
@@ -575,6 +798,27 @@
                 Notes.renderAll();
                 UI.initCalculator();
             },
+
+            // Ocultar / Mostrar Sidebar
+            toggleSidebar: () => {
+                const sidebar = document.getElementById('main-sidebar');
+                if (sidebar) {
+                    sidebar.classList.toggle('collapsed');
+                    State.settings.sidebarCollapsed = sidebar.classList.contains('collapsed');
+                    StorageDB.save();
+                }
+            },
+
+            // Ocultar / Mostrar Barra Superior para Máximo Espacio
+            toggleFullWorkspaceMode: () => {
+                const topbar = document.getElementById('main-topbar');
+                const exitBtn = document.getElementById('exit-compact-topbar');
+                if (topbar) {
+                    topbar.classList.toggle('hidden-safely');
+                    const isHidden = topbar.classList.contains('hidden-safely');
+                    if (exitBtn) exitBtn.classList.toggle('hidden-safely', !isHidden);
+                }
+            },
             
             // Navegación principal
             renderToolsGrid: (viewId, searchQuery = '') => {
@@ -582,7 +826,6 @@
                 const grid = document.getElementById('tools-grid');
                 const title = document.getElementById('current-view-title');
                 
-                // Actualizar menú activo
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.classList.remove('bg-white/10', 'text-white');
                     btn.classList.add('text-dark-muted');
@@ -674,14 +917,12 @@
                 select.innerHTML = '';
 
                 State.categories.forEach(cat => {
-                    // Sidebar
                     const btn = document.createElement('button');
                     btn.className = 'nav-btn flex items-center gap-3 w-full p-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/5 text-dark-muted truncate';
                     btn.dataset.view = cat.id;
                     btn.innerHTML = `<i class="fa-solid ${cat.icon} w-5 text-center"></i> <span class="truncate">${cat.name}</span>`;
                     list.appendChild(btn);
 
-                    // Select form
                     const opt = document.createElement('option');
                     opt.value = cat.id;
                     opt.textContent = cat.name;
@@ -703,7 +944,6 @@
                 grid.className = `workspace-grid grid-${layout}`;
                 
                 const count = parseInt(layout);
-                // Ajustar array de State.session.activeScreens
                 while(State.session.activeScreens.length < count) {
                     State.session.activeScreens.push({ id: State.session.activeScreens.length + 1, toolId: null });
                 }
@@ -723,10 +963,22 @@
                     cell.className = 'iframe-container border border-dark-border shadow-md';
                     cell.dataset.screenId = screen.id;
 
-                    if (screen.toolId) {
+                    if (screen.pdfUrl) {
+                        cell.innerHTML = `
+                            <div class="iframe-header flex justify-between items-center group">
+                                <div class="flex items-center gap-2 overflow-hidden">
+                                    <i class="fa-solid fa-file-pdf text-red-500"></i>
+                                    <span class="font-semibold truncate max-w-[200px]" title="${screen.pdfName || 'Documento PDF'}">${screen.pdfName || 'Documento PDF'}</span>
+                                </div>
+                                <div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="App.closeScreenTool(${screen.id})" class="iframe-btn text-red-400 hover:text-red-300" title="Cerrar PDF"><i class="fa-solid fa-times"></i></button>
+                                </div>
+                            </div>
+                            <iframe id="frame-${screen.id}" src="${screen.pdfUrl}" type="application/pdf" class="w-full h-full border-none"></iframe>
+                        `;
+                    } else if (screen.toolId) {
                         const tool = State.tools.find(t => t.id === screen.toolId);
                         if (tool) {
-                            // Validar contraseña si la tiene
                             if(tool.password && !screen.unlocked) {
                                 cell.innerHTML = `
                                     <div class="flex-1 flex flex-col items-center justify-center bg-dark-bg text-white p-6">
@@ -739,38 +991,139 @@
                                     </div>
                                 `;
                             } else {
-                                // Herramienta abierta
                                 cell.innerHTML = `
                                     <div class="iframe-header flex justify-between items-center group">
                                         <div class="flex items-center gap-2 overflow-hidden">
-                                            <i class="${tool.icon} text-brand-500"></i>
-                                            <span class="font-semibold truncate max-w-[200px]" title="${tool.name}">${tool.name}</span>
+                                            <i class="${tool.icon} text-brand-500 text-xs"></i>
+                                            <span class="font-semibold truncate max-w-[220px]" title="${tool.name}">${tool.name}</span>
                                         </div>
-                                        <div class="flex items-center gap-1 opacity-50 group-hover:opacity-100 transition-opacity">
+                                        <div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
                                             <button onclick="document.getElementById('frame-${screen.id}').src = '${tool.url}'" class="iframe-btn" title="Recargar"><i class="fa-solid fa-rotate-right"></i></button>
                                             <button onclick="App.openToolExternal('${tool.url}')" class="iframe-btn" title="Abrir externamente"><i class="fa-solid fa-external-link"></i></button>
-                                            <button onclick="App.expandScreen(${screen.id})" class="iframe-btn text-brand-500" title="Expandir"><i class="fa-solid fa-expand"></i></button>
-                                            <button onclick="App.closeScreenTool(${screen.id})" class="iframe-btn text-red-500" title="Cerrar"><i class="fa-solid fa-times"></i></button>
+                                            <button onclick="App.expandScreen(${screen.id})" class="iframe-btn text-brand-400" title="Expandir"><i class="fa-solid fa-expand"></i></button>
+                                            <button onclick="App.closeScreenTool(${screen.id})" class="iframe-btn text-red-400 hover:text-red-300" title="Cerrar"><i class="fa-solid fa-times"></i></button>
                                         </div>
                                     </div>
                                     <iframe id="frame-${screen.id}" src="${tool.url}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
                                 `;
                             }
                         } else {
-                             App.closeScreenTool(screen.id); // Herramienta ya no existe
+                            App.closeScreenTool(screen.id);
                         }
                     } else {
-                        // Celda vacía
                         cell.innerHTML = `
-                            <div class="flex-1 flex flex-col items-center justify-center bg-dark-bg/50 border border-dashed border-dark-border/50 text-dark-muted">
+                            <div class="flex-1 flex flex-col items-center justify-center bg-dark-bg/50 border border-dashed border-dark-border/50 text-dark-muted p-4 text-center">
                                 <i class="fa-solid fa-desktop text-3xl mb-3 opacity-50"></i>
-                                <p class="text-sm">Pantalla ${index + 1} libre</p>
-                                <button onclick="UI.switchToDashboard()" class="mt-4 px-4 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-sm transition-colors text-white border border-white/10">Buscar herramienta</button>
+                                <p class="text-xs mb-3 font-medium">Pantalla ${index + 1} libre</p>
+                                <div class="flex flex-wrap gap-2 justify-center">
+                                    <button onclick="UI.switchToDashboard()" class="px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs transition-colors text-white border border-white/10 flex items-center gap-1">
+                                        <i class="fa-solid fa-plus"></i> Usar Herramienta
+                                    </button>
+                                    <label class="px-3 py-1.5 bg-brand-900/40 hover:bg-brand-600 rounded-lg text-xs transition-colors text-white border border-brand-500/30 cursor-pointer flex items-center gap-1">
+                                        <i class="fa-solid fa-file-pdf text-red-400"></i> Abrir PDF Local
+                                        <input type="file" accept="application/pdf" class="hidden" onchange="App.openLocalPdf(event, ${screen.id})">
+                                    </label>
+                                </div>
                             </div>
                         `;
                     }
                     grid.appendChild(cell);
                 });
+            },
+
+            openManageCategoriesModal: () => {
+                UI.renderManageCategories();
+                document.getElementById('modal-categories').classList.remove('hidden-safely');
+            },
+
+            renderManageCategories: () => {
+                const list = document.getElementById('categories-manage-list');
+                list.innerHTML = '';
+
+                State.categories.forEach(cat => {
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center gap-2 bg-dark-bg p-2.5 rounded-lg border border-dark-border';
+                    row.innerHTML = `
+                        <input type="text" value="${cat.icon || ''}" placeholder="fa-camera" onchange="App.updateCategory('${cat.id}', 'icon', this.value)" class="w-24 glass-input p-1.5 text-xs rounded font-mono text-center" title="Icono FontAwesome">
+                        <input type="text" value="${cat.name}" onchange="App.updateCategory('${cat.id}', 'name', this.value)" class="flex-1 glass-input p-1.5 text-xs rounded font-medium">
+                        <button onclick="App.deleteCategory('${cat.id}')" class="w-8 h-8 flex items-center justify-center text-red-400 hover:text-white hover:bg-red-500/20 rounded transition-colors" title="Eliminar categoría">
+                            <i class="fa-solid fa-trash text-xs"></i>
+                        </button>
+                    `;
+                    list.appendChild(row);
+                });
+            },
+
+            toggleAlertaClientes: () => {
+                const panel = document.getElementById('alerta-panel');
+                const isHidden = panel.classList.contains('hidden-safely');
+                if (isHidden) {
+                    panel.classList.remove('hidden-safely');
+                    UI.renderAlertaContent();
+                } else {
+                    panel.classList.add('hidden-safely');
+                }
+            },
+
+            promptAlertaUrl: () => {
+                const current = State.settings.alertaUrl || '';
+                const url = prompt("Ingresa la URL para 'Alerta Clientes':", current);
+                if (url !== null) {
+                    State.settings.alertaUrl = url.trim();
+                    StorageDB.save();
+                    UI.renderAlertaContent();
+                }
+            },
+
+            zoomAlerta: (delta) => {
+                let current = State.settings.alertaZoom || 100;
+                current = Math.min(Math.max(30, current + delta), 250);
+                State.settings.alertaZoom = current;
+                StorageDB.save();
+                UI.applyAlertaZoom();
+            },
+
+            resetAlertaZoom: () => {
+                State.settings.alertaZoom = 100;
+                StorageDB.save();
+                UI.applyAlertaZoom();
+            },
+
+            applyAlertaZoom: () => {
+                const zoom = State.settings.alertaZoom || 100;
+                const badge = document.getElementById('alerta-zoom-level');
+                if (badge) badge.textContent = `${zoom}%`;
+
+                const iframe = document.getElementById('alerta-iframe');
+                if (iframe) {
+                    const factor = zoom / 100;
+                    iframe.style.transform = `scale(${factor})`;
+                    iframe.style.transformOrigin = '0 0';
+                    iframe.style.width = `${100 / factor}%`;
+                    iframe.style.height = `${100 / factor}%`;
+                }
+            },
+
+            renderAlertaContent: () => {
+                const body = document.getElementById('alerta-body');
+                const url = State.settings.alertaUrl;
+
+                if (!url) {
+                    body.innerHTML = `
+                        <div class="flex-1 flex flex-col items-center justify-center p-6 text-center text-white">
+                            <i class="fa-solid fa-bell-slash text-4xl text-brand-400 mb-3"></i>
+                            <h4 class="font-bold text-base mb-1">Sin enlace configurado</h4>
+                            <p class="text-xs text-dark-muted mb-4">Ingresa la dirección web que deseas visualizar en esta pantalla flotante.</p>
+                            <div class="w-full flex gap-2 max-w-xs">
+                                <input type="text" id="input-alerta-url" placeholder="https://..." class="glass-input p-2 text-xs rounded flex-1">
+                                <button onclick="const input = document.getElementById('input-alerta-url'); if(input.value){ State.settings.alertaUrl = input.value.trim(); StorageDB.save(); UI.renderAlertaContent(); }" class="px-3 py-2 bg-brand-600 hover:bg-brand-500 rounded text-xs font-semibold">Guardar</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    body.innerHTML = `<iframe id="alerta-iframe" src="${url}" class="border-none" style="width:100%; height:100%; border:none;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>`;
+                    UI.applyAlertaZoom();
+                }
             },
 
             // Modales y Paneles
@@ -789,6 +1142,10 @@
                 document.getElementById('setting-calc-type').value = State.settings.calcType;
                 document.getElementById('setting-calc-url').value = State.settings.calcUrl;
                 document.getElementById('calc-url-container').classList.toggle('hidden-safely', State.settings.calcType === 'basic');
+                const syncModeEl = document.getElementById('setting-sync-mode');
+                if (syncModeEl) syncModeEl.value = isLocalOnly ? 'local' : 'cloud';
+                const cloudCont = document.getElementById('cloud-settings-container');
+                if (cloudCont) cloudCont.style.display = isLocalOnly ? 'none' : 'block';
                 document.getElementById('modal-settings').classList.remove('hidden-safely');
             },
             closeModals: () => {
@@ -805,7 +1162,6 @@
             toggleNotes: () => document.getElementById('notes-panel').classList.toggle('hidden-safely'),
             toggleCalculator: () => document.getElementById('calc-panel').classList.toggle('hidden-safely'),
 
-            // Configuraciones visuales
             applySettings: () => {
                 const bg = document.getElementById('custom-bg');
                 const overlay = document.getElementById('bg-overlay');
@@ -822,9 +1178,7 @@
 
             getIconHtml: (iconClass) => `<i class="fa-solid ${iconClass || 'fa-cube'}"></i>`,
 
-            // Listeners Generales
             setupEventListeners: () => {
-                // Navegación Sidebar
                 document.getElementById('sidebar-menu').addEventListener('click', (e) => {
                     const btn = e.target.closest('.nav-btn');
                     if(btn) {
@@ -834,24 +1188,20 @@
                     }
                 });
 
-                // Buscador
                 document.getElementById('global-search').addEventListener('input', (e) => {
                     UI.renderToolsGrid(State.session.currentView, e.target.value);
                 });
 
-                // Multipantalla
                 document.getElementById('screen-selector').addEventListener('change', (e) => {
                     const layout = e.target.value;
                     UI.updateWorkspaceGrid(layout);
                     UI.switchToWorkspace();
                 });
 
-                // Clic fuera de menús para cerrarlos
                 document.addEventListener('click', () => {
                     document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add('hidden-safely'));
                 });
 
-                // Settings listeners
                 const updateBg = () => {
                     State.settings.bgUrl = document.getElementById('setting-bg-url').value;
                     State.settings.bgOpacity = document.getElementById('setting-bg-opacity').value;
@@ -883,7 +1233,6 @@
                     UI.initCalculator();
                 });
 
-                // Pestañas de configuración
                 document.querySelectorAll('.settings-tab').forEach(tab => {
                     tab.addEventListener('click', (e) => {
                         document.querySelectorAll('.settings-tab').forEach(t => {
@@ -900,18 +1249,19 @@
 
                 // Atajos de teclado
                 document.addEventListener('keydown', (e) => {
-                    if (e.ctrlKey && e.key === 'k') { e.preventDefault(); document.getElementById('global-search').focus(); }
-                    if (e.ctrlKey && e.key === 'n') { e.preventDefault(); UI.openAddToolModal(); }
-                    if (e.ctrlKey && e.shiftKey && e.key === 'F') { 
+                    if (e.ctrlKey && e.key.toLowerCase() === 'b') { e.preventDefault(); UI.toggleSidebar(); }
+                    if (e.ctrlKey && e.key.toLowerCase() === 'k') { e.preventDefault(); document.getElementById('global-search').focus(); }
+                    if (e.ctrlKey && e.key.toLowerCase() === 'n') { e.preventDefault(); UI.openAddToolModal(); }
+                    if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'F') { 
                         e.preventDefault(); 
                         State.session.currentView = 'favorites';
                         UI.renderToolsGrid('favorites');
                     }
                 });
 
-                // Drag básico para paneles
                 UI.makeDraggable('notes-panel', 'notes-header');
                 UI.makeDraggable('calc-panel', 'calc-header');
+                UI.makeDraggable('alerta-panel', 'alerta-header');
             },
 
             makeDraggable: (elementId, handleId) => {
@@ -928,7 +1278,7 @@
                         pos3 = e.clientX; pos4 = e.clientY;
                         el.style.top = (el.offsetTop - pos2) + "px";
                         el.style.left = (el.offsetLeft - pos1) + "px";
-                        el.style.right = 'auto'; // Disable right anchoring once dragged
+                        el.style.right = 'auto';
                     };
                 };
             },
@@ -938,7 +1288,6 @@
                 if (State.settings.calcType === 'custom' && State.settings.calcUrl) {
                     content.innerHTML = `<iframe src="${State.settings.calcUrl}" class="w-full h-full border-none"></iframe>`;
                 } else {
-                    // Calculadora Básica Integrada (HTML simple)
                     content.innerHTML = `
                         <div class="h-full bg-dark-bg p-3 flex flex-col gap-2 rounded-b-xl text-white">
                             <input type="text" id="calc-display" class="w-full h-12 glass-input text-right text-xl rounded-lg px-3 mb-2" readonly value="0">
@@ -974,6 +1323,61 @@
 
         window.App = {
             generateId: () => 't_' + Math.random().toString(36).substr(2, 9),
+
+            updateCategory: (catId, field, value) => {
+                const cat = State.categories.find(c => c.id === catId);
+                if (cat) {
+                    cat[field] = value.trim();
+                    StorageDB.save();
+                    UI.renderCategories();
+                    UI.renderToolsGrid(State.session.currentView);
+                }
+            },
+
+            deleteCategory: (catId) => {
+                if (State.categories.length <= 1) {
+                    alert("Debes tener al menos una categoría.");
+                    return;
+                }
+                if (confirm("¿Estás seguro de eliminar esta categoría? Las herramientas asociadas se reasignarán.")) {
+                    State.categories = State.categories.filter(c => c.id !== catId);
+                    const fallbackId = State.categories[0].id;
+                    State.tools.forEach(t => {
+                        if (t.categoryId === catId) t.categoryId = fallbackId;
+                    });
+                    
+                    StorageDB.save();
+                    UI.renderCategories();
+                    UI.renderManageCategories();
+                    UI.renderToolsGrid(State.session.currentView);
+                }
+            },
+
+            addCategory: () => {
+                const newCat = {
+                    id: 'cat-' + Math.random().toString(36).substr(2, 6),
+                    name: 'Nueva Categoría',
+                    icon: 'fa-folder'
+                };
+                State.categories.push(newCat);
+                StorageDB.save();
+                UI.renderCategories();
+                UI.renderManageCategories();
+            },
+
+            openLocalPdf: (event, screenId) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const pdfBlobUrl = URL.createObjectURL(file);
+                const screen = State.session.activeScreens.find(s => s.id === screenId);
+                if (screen) {
+                    screen.toolId = null;
+                    screen.pdfUrl = pdfBlobUrl;
+                    screen.pdfName = file.name;
+                    UI.renderWorkspaceScreens();
+                }
+            },
             
             loadInitialData: () => {
                 State.tools = [
@@ -1033,7 +1437,6 @@
             deleteTool: (id) => {
                 if(confirm("¿Seguro que deseas eliminar esta herramienta?")) {
                     State.tools = State.tools.filter(t => t.id !== id);
-                    // Remover de recientes y pantallas
                     State.recents = State.recents.filter(rid => rid !== id);
                     State.session.activeScreens.forEach(s => { if(s.toolId === id) s.toolId = null; });
                     
@@ -1052,21 +1455,16 @@
                 }
             },
 
-            // Lógica de apertura en el Workspace
             openTool: (toolId) => {
-                // Agregar a recientes
                 State.recents = [toolId, ...State.recents.filter(id => id !== toolId)].slice(0, 10);
                 
-                // Buscar una pantalla libre
                 let screen = State.session.activeScreens.find(s => !s.toolId);
-                
                 if (!screen) {
-                    // Si no hay libres, usar la primera (reemplazar)
                     screen = State.session.activeScreens[0];
                 }
 
                 screen.toolId = toolId;
-                screen.unlocked = false; // Reset lock state
+                screen.unlocked = false;
                 
                 StorageDB.save();
                 UI.switchToWorkspace();
@@ -1081,6 +1479,8 @@
                 const screen = State.session.activeScreens.find(s => s.id === screenId);
                 if(screen) {
                     screen.toolId = null;
+                    screen.pdfUrl = null;
+                    screen.pdfName = null;
                     StorageDB.save();
                     UI.renderWorkspaceScreens();
                 }
@@ -1089,18 +1489,13 @@
             expandScreen: (screenId) => {
                 const grid = document.getElementById('workspace-grid');
                 if (grid.classList.contains('expanded-mode')) {
-                    // Restaurar
                     grid.classList.remove('expanded-mode');
                     grid.className = `workspace-grid grid-${State.session.screenLayout || '1'}`;
                     document.querySelectorAll('.iframe-container').forEach(c => c.style.display = 'flex');
                 } else {
-                    // Expandir
                     grid.className = 'workspace-grid grid-1 expanded-mode';
                     document.querySelectorAll('.iframe-container').forEach(c => {
                         if (parseInt(c.dataset.screenId) !== screenId) c.style.display = 'none';
-                        else {
-                            // Actualizar botón de expandir a restaurar visualmente si quisieramos
-                        }
                     });
                 }
             },
@@ -1121,12 +1516,11 @@
                 }
             },
 
-            // Backups
             exportBackup: () => {
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage.getItem('imprenta_data')));
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage.getItem('grafiplot_data')));
                 const node = document.createElement('a');
                 node.setAttribute("href", dataStr);
-                node.setAttribute("download", "imprenta_backup.json");
+                node.setAttribute("download", "grafiplot_backup.json");
                 document.body.appendChild(node);
                 node.click();
                 node.remove();
@@ -1138,11 +1532,10 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
-                        // Limpiar doble stringify si existe
                         let content = e.target.result;
                         if(content.startsWith('"')) content = JSON.parse(content); 
                         
-                        localStorage.setItem('imprenta_data', content);
+                        localStorage.setItem('grafiplot_data', content);
                         alert("Backup restaurado. La aplicación se recargará.");
                         location.reload();
                     } catch (err) {
@@ -1187,17 +1580,14 @@
                 const ta = document.getElementById('note-' + noteId);
                 if(!ta) return;
                 let val = ta.value;
-                // Si el usuario presionó el botón y ya tenía un '=', lo ignoramos para procesar
                 if (val.trim().endsWith('=')) {
                     val = val.substring(0, val.lastIndexOf('='));
                 }
                 
                 try {
-                    // Busca solo la operación matemática al final (ignorando el texto previo)
                     const match = val.match(/([0-9\.\+\-\*\/\(\)\s]+)$/);
                     if (match && match[1].trim() !== '') {
                         const expr = match[1].trim();
-                        // Asegurar que haya un número y un operador válido
                         if (/[0-9]/.test(expr) && /[\+\-\*\/]/.test(expr)) {
                             const result = new Function('return ' + expr)();
                             ta.value = val + (val.endsWith(' ') ? '' : ' ') + "= " + result;
@@ -1209,13 +1599,15 @@
 
             renderAll: () => {
                 const list = document.getElementById('notes-list');
+                const activeElementId = document.activeElement ? document.activeElement.id : null;
+                const activeSelection = document.activeElement ? document.activeElement.selectionStart : null;
+                
                 list.innerHTML = '';
                 State.notes.forEach(note => {
                     const el = document.createElement('div');
                     const colorClass = Notes.colors[note.color] || Notes.colors.yellow;
                     el.className = `relative p-3 rounded-lg border shadow-sm ${colorClass}`;
                     
-                    // Botón "=" agrandado a text-xl y con mayor tamaño (w-6 h-6)
                     el.innerHTML = `
                         <button onclick="Notes.evalMath('${note.id}')" title="Calcular Resultado" class="absolute top-1 right-8 w-6 h-6 flex items-center justify-center text-black/50 hover:text-black hover:bg-black/10 rounded font-black text-xl transition-colors">=</button>
                         <button onclick="Notes.remove('${note.id}')" class="absolute top-1 right-2 w-6 h-6 flex items-center justify-center text-black/50 hover:text-black hover:bg-black/10 rounded transition-colors"><i class="fa-solid fa-times text-sm"></i></button>
@@ -1226,11 +1618,9 @@
                     const ta = el.querySelector('textarea');
                     ta.addEventListener('input', (e) => {
                         let val = e.target.value;
-                        // Evaluación al presionar el símbolo "="
                         if (val.endsWith('=')) {
                             try {
                                 const textBeforeEq = val.slice(0, -1);
-                                // Extrae solo los números y operadores previos al =
                                 const match = textBeforeEq.match(/([0-9\.\+\-\*\/\(\)\s]+)$/);
                                 if (match && match[1].trim() !== '') {
                                     const expr = match[1].trim();
@@ -1245,40 +1635,19 @@
                         Notes.update(note.id, val);
                     });
                 });
-            }
-        };
 
-        window.Calc = {
-            val: '0',
-            op: null,
-            prev: null,
-            update: () => { document.getElementById('calc-display').value = Calc.val; },
-            num: (n) => { 
-                if(Calc.val === '0' && n !== '.') Calc.val = n; 
-                else Calc.val += n; 
-                Calc.update(); 
-            },
-            cmd: (c) => { 
-                if(c === 'clear') { Calc.val = '0'; Calc.op = null; Calc.prev = null; }
-                if(c === 'del') Calc.val = Calc.val.length > 1 ? Calc.val.slice(0, -1) : '0';
-                Calc.update();
-            },
-            op: (o) => { 
-                Calc.prev = Calc.val; Calc.val = '0'; Calc.op = o; 
-            },
-            eq: () => {
-                if(Calc.prev && Calc.op) {
-                    try {
-                        Calc.val = String(new Function('return ' + Calc.prev + Calc.op + Calc.val)());
-                        Calc.op = null; Calc.prev = null;
-                        Calc.update();
-                    } catch(e) { Calc.val = 'Error'; Calc.update(); }
+                if (activeElementId && document.getElementById(activeElementId)) {
+                    const activeEl = document.getElementById(activeElementId);
+                    activeEl.focus();
+                    if (activeSelection !== null) {
+                        try { activeEl.setSelectionRange(activeSelection, activeSelection); } catch(e){}
+                    }
                 }
             }
         };
 
         window.onload = () => {
-            initFirebase(); // Inicia la conexión, descarga los datos y luego arranca UI.init()
+            initFirebase();
         };
 
     </script>
