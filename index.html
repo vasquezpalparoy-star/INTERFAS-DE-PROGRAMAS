@@ -557,44 +557,14 @@
         // ==========================================
         // ESTADO GLOBAL Y PERSISTENCIA
         // ==========================================
-        const INITIAL_TOOLS = [
-            // Fotografías
-            { id: 't_1', name: 'Redimensionar Foto DNI / Carnet', desc: 'Preparar fotos carnet, pasaporte y DNI para impresión.', url: 'https://www.photopea.com', categoryId: 'cat-1', icon: 'fa-solid fa-id-card', favorite: true },
-            { id: 't_2', name: 'Remover Fondo (Remove.bg)', desc: 'Eliminar fondos de fotos de clientes en un clic.', url: 'https://www.remove.bg/es', categoryId: 'cat-1', icon: 'fa-solid fa-scissors', favorite: true },
-            { id: 't_3', name: 'Compresor de Imágenes (TinyPNG)', desc: 'Comprimir JPG y PNG manteniendo la máxima resolución de impresión.', url: 'https://tinypng.com/', categoryId: 'cat-1', icon: 'fa-solid fa-file-image', favorite: false },
-            
-            // Documentos
-            { id: 't_4', name: 'WhatsApp Web Atención', desc: 'Recibir archivos, PDFs y comprobantes de clientes rápidamente.', url: 'https://web.whatsapp.com/', categoryId: 'cat-2', icon: 'fa-brands fa-whatsapp', favorite: true },
-            { id: 't_5', name: 'Google Drive Imprenta', desc: 'Repositorio de archivos pesados y diseños en la nube.', url: 'https://drive.google.com/', categoryId: 'cat-2', icon: 'fa-brands fa-google-drive', favorite: false },
-            
-            // Tamaños y Medidas
-            { id: 't_6', name: 'Calculadora de Escalas y Proporciones', desc: 'Calcular proporciones exactas para gigantografías y ampliaciones.', url: 'https://www.calculator.net/ratio-calculator.html', categoryId: 'cat-3', icon: 'fa-solid fa-ruler-combined', favorite: true },
-            { id: 't_7', name: 'Guía de Medidas ISO de Papel', desc: 'Consulta de dimensiones A4, A3, Folio, Banners y formatos estándar.', url: 'https://www.papersizes.org/', categoryId: 'cat-3', icon: 'fa-solid fa-ruler', favorite: false },
-
-            // Facturas y RUC
-            { id: 't_8', name: 'Consulta RUC - SUNAT', desc: 'Verificar estado de contribuyentes y razón social.', url: 'https://e-consultaruc.sunat.gob.pe/clruc-tm-complex/consRuc.jsp', categoryId: 'cat-4', icon: 'fa-solid fa-building-columns', favorite: true },
-            { id: 't_9', name: 'Portal SUNAT Clave SOL', desc: 'Emisión y gestión de comprobantes fiscales.', url: 'https://www.sunat.gob.pe/', categoryId: 'cat-4', icon: 'fa-solid fa-file-invoice-dollar', favorite: false },
-
-            // Boletas
-            { id: 't_10', name: 'Generador de Cotizaciones / Boletas', desc: 'Crear cotizaciones y notas de venta rápidas para clientes.', url: 'https://www.facturacion.cl/', categoryId: 'cat-5', icon: 'fa-solid fa-receipt', favorite: true },
-            { id: 't_11', name: 'Emisión Boletas Electrónicas', desc: 'Acceso directo a emisión de comprobantes de venta rápida.', url: 'https://www.sunat.gob.pe/', categoryId: 'cat-5', icon: 'fa-solid fa-file-signature', favorite: false },
-
-            // PDF
-            { id: 't_12', name: 'ILovePDF (Suite Completa)', desc: 'Unir, dividir, comprimir y convertir archivos PDF.', url: 'https://www.ilovepdf.com/es', categoryId: 'cat-6', icon: 'fa-solid fa-file-pdf', favorite: true },
-            { id: 't_13', name: 'PDF24 Tools Web', desc: 'Herramientas avanzadas para editar y reparar PDFs dañados.', url: 'https://tools.pdf24.org/es/', categoryId: 'cat-6', icon: 'fa-solid fa-toolbox', favorite: false },
-            { id: 't_14', name: 'Sejda Editor PDF', desc: 'Editar textos, firmar y modificar documentos PDF en línea.', url: 'https://www.sejda.com/es/pdf-editor', categoryId: 'cat-6', icon: 'fa-solid fa-pen-to-square', favorite: false },
-
-            // Impresión y Preprensa
-            { id: 't_15', name: 'Generador Código de Barras', desc: 'Crear códigos EAN-13, CODE128 para etiquetas de productos.', url: 'https://barcode.tec-it.com/es', categoryId: 'cat-7', icon: 'fa-solid fa-barcode', favorite: true },
-            { id: 't_16', name: 'Conversor y Paleta CMYK / RGB', desc: 'Verificar equivalencias de color de pantalla a tinta offset e inyección.', url: 'https://www.colordesigner.io/', categoryId: 'cat-7', icon: 'fa-solid fa-droplet', favorite: false },
-            { id: 't_17', name: 'WhatTheFont (Buscador de Fuentes)', desc: 'Identificar la tipografía usada en una foto o diseño del cliente.', url: 'https://www.myfonts.com/pages/whatthefont', categoryId: 'cat-7', icon: 'fa-solid fa-font', favorite: true },
-
-            // Herramientas y Diseño
-            { id: 't_18', name: 'Photopea (Photoshop Web)', desc: 'Editor completo para archivos .PSD, .AI, .CDR y .PDF.', url: 'https://www.photopea.com', categoryId: 'cat-8', icon: 'fa-solid fa-palette', favorite: true },
-            { id: 't_19', name: 'Canva Web Imprenta', desc: 'Creación rápida de volantes, gigantografías y tarjetas.', url: 'https://www.canva.com', categoryId: 'cat-8', icon: 'fa-solid fa-pen-nib', favorite: true },
-            { id: 't_20', name: 'Vectorizer.ai (Vectorizador)', desc: 'Convertir logos e imágenes de baja calidad a vectores SVG/EPS.', url: 'https://vectorizer.ai/', categoryId: 'cat-8', icon: 'fa-solid fa-bezier-curve', favorite: true },
-            { id: 't_21', name: 'Generador de Códigos QR', desc: 'Generar QR de alta resolución para imprimir en publicidad.', url: 'https://es.qr-code-generator.com/', categoryId: 'cat-8', icon: 'fa-solid fa-qrcode', favorite: false }
-        ];
+        // Sin aplicaciones/herramientas predeterminadas.
+        // Estos IDs pertenecían a las herramientas incluidas en versiones anteriores
+        // y se eliminan una sola vez al cargar datos antiguos del navegador/nube.
+        const LEGACY_DEFAULT_TOOL_IDS = new Set([
+            't_1','t_2','t_3','t_4','t_5','t_6','t_7','t_8','t_9','t_10','t_11',
+            't_12','t_13','t_14','t_15','t_16','t_17','t_18','t_19','t_20','t_21'
+        ]);
+        const INITIAL_TOOLS = [];
 
         window.State = {
             tools: [...INITIAL_TOOLS],
@@ -628,7 +598,7 @@
                     date: Date.now() - 2000
                 }
             ],
-            recents: ['t_1', 't_12', 't_18', 't_20'],
+            recents: [],
             settings: {
                 bgUrl: '', bgOpacity: 50, bgBlur: 0,
                 restoreSession: true, calcType: 'basic', calcUrl: '',
@@ -639,6 +609,7 @@
 
         window.StorageDB = {
             saveTimeout: null,
+            lastLocalUpdate: 0,
 
             getDocRef: () => {
                 if (!db) return null;
@@ -731,6 +702,18 @@
                 unsubscribeFirebase = onSnapshot(docRef, (snap) => {
                     if (snap.exists()) {
                         const cloudData = snap.data();
+
+                        // Evitar que nuestra propia escritura vuelva a renderizar todas las
+                        // herramientas/iframes. Esto es especialmente importante al escribir notas.
+                        const isOwnWrite = !!(cloudData.lastUpdate && cloudData.lastUpdate === StorageDB.lastLocalUpdate);
+                        const hasPendingWrites = !!(snap.metadata && snap.metadata.hasPendingWrites);
+                        if (isOwnWrite || hasPendingWrites) {
+                            if (!hasPendingWrites) {
+                                StorageDB.updateSyncUIStatus('success', 'Firebase Sincronizado', `Guardado silencioso: ${new Date().toLocaleTimeString()}`);
+                            }
+                            return;
+                        }
+
                         localStorage.setItem('grafiplot_data', JSON.stringify(cloudData));
                         StorageDB.applyData(cloudData);
                         
@@ -770,7 +753,9 @@
                 });
             },
 
-            save: () => {
+            save: (silent = false) => {
+                const updateStamp = Date.now();
+                StorageDB.lastLocalUpdate = updateStamp;
                 const dataObj = {
                     tools: State.tools,
                     categories: State.categories,
@@ -778,13 +763,13 @@
                     recents: State.recents,
                     settings: State.settings,
                     session: State.session,
-                    lastUpdate: Date.now()
+                    lastUpdate: updateStamp
                 };
                 
                 localStorage.setItem('grafiplot_data', JSON.stringify(dataObj));
                 
                 if (isLocalOnly) {
-                    StorageDB.updateSyncUIStatus('success_local', 'Guardado Local Activo', `Último cambio guardado: ${new Date().toLocaleTimeString()}`);
+                    if (!silent) StorageDB.updateSyncUIStatus('success_local', 'Guardado Local Activo', `Último cambio guardado: ${new Date().toLocaleTimeString()}`);
                     return;
                 }
 
@@ -792,16 +777,16 @@
                     const docRef = StorageDB.getDocRef();
                     if (!docRef) return;
 
-                    StorageDB.updateSyncUIStatus('saving', 'Sincronizando Nube...');
+                    if (!silent) StorageDB.updateSyncUIStatus('saving', 'Sincronizando Nube...');
 
                     clearTimeout(StorageDB.saveTimeout);
                     StorageDB.saveTimeout = setTimeout(async () => {
                         try {
                             await setDoc(docRef, dataObj);
-                            StorageDB.updateSyncUIStatus('success', 'Firebase Sincronizado', `Sincronizado a las ${new Date().toLocaleTimeString()}`);
+                            if (!silent) StorageDB.updateSyncUIStatus('success', 'Firebase Sincronizado', `Sincronizado a las ${new Date().toLocaleTimeString()}`);
                         } catch(e) { 
                             console.warn("Error guardando en nube, respaldado localmente:", e.message); 
-                            StorageDB.updateSyncUIStatus('success_local', 'Guardado Localmente', 'Cambios guardados localmente.');
+                            if (!silent) StorageDB.updateSyncUIStatus('success_local', 'Guardado Localmente', 'Cambios guardados localmente.');
                         }
                     }, 400);
                 }
@@ -812,9 +797,15 @@
                 if (data) {
                     try {
                         const parsed = JSON.parse(data);
-                        // Asegurar que si el almacenamiento previo tiene pocas herramientas, se usen/fusionen las precargadas
-                        if (!parsed.tools || parsed.tools.length < 10) {
-                            parsed.tools = [...INITIAL_TOOLS];
+                        // Migrar versiones anteriores: eliminar únicamente las herramientas
+                        // que venían precargadas por defecto. Las herramientas creadas por el usuario se conservan.
+                        if (Array.isArray(parsed.tools)) {
+                            parsed.tools = parsed.tools.filter(t => !LEGACY_DEFAULT_TOOL_IDS.has(t.id));
+                        } else {
+                            parsed.tools = [];
+                        }
+                        if (Array.isArray(parsed.recents)) {
+                            parsed.recents = parsed.recents.filter(id => !LEGACY_DEFAULT_TOOL_IDS.has(id));
                         }
                         StorageDB.applyData(parsed);
                     } catch(e) { window.App.loadInitialData(); }
@@ -824,23 +815,24 @@
             },
 
             applyData: (parsed) => {
-                if (parsed.tools && Array.isArray(parsed.tools) && parsed.tools.length > 0) {
-                    // Si el usuario tenía pocas herramientas previas, asegurar que incluya las herramientas principales
-                    const existingIds = new Set(parsed.tools.map(t => t.id));
-                    INITIAL_TOOLS.forEach(initTool => {
-                        if (!existingIds.has(initTool.id)) {
-                            parsed.tools.push(initTool);
-                        }
-                    });
-                    State.tools = parsed.tools;
-                } else {
-                    State.tools = [...INITIAL_TOOLS];
-                }
+                State.tools = Array.isArray(parsed.tools)
+                    ? parsed.tools.filter(t => !LEGACY_DEFAULT_TOOL_IDS.has(t.id))
+                    : [];
                 if (parsed.categories && parsed.categories.length > 0) State.categories = parsed.categories;
-                if (parsed.notes && parsed.notes.length > 0) State.notes = parsed.notes;
-                if (parsed.recents) State.recents = parsed.recents;
+                if (Array.isArray(parsed.notes)) State.notes = parsed.notes;
+                if (Array.isArray(parsed.recents)) State.recents = parsed.recents.filter(id => !LEGACY_DEFAULT_TOOL_IDS.has(id));
                 State.settings = { ...State.settings, ...parsed.settings };
-                if (State.settings.restoreSession && parsed.session) State.session = parsed.session;
+                if (State.settings.restoreSession && parsed.session) {
+                    State.session = parsed.session;
+                    if (Array.isArray(State.session.activeScreens)) {
+                        State.session.activeScreens.forEach(screen => {
+                            if (LEGACY_DEFAULT_TOOL_IDS.has(screen.toolId)) {
+                                screen.toolId = null;
+                                screen.unlocked = false;
+                            }
+                        });
+                    }
+                }
             }
         };
 
@@ -1043,6 +1035,7 @@
                                     <span class="font-semibold truncate max-w-[200px]" title="${screen.pdfName || 'Documento PDF'}">${screen.pdfName || 'Documento PDF'}</span>
                                 </div>
                                 <div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="App.downloadScreenPdf(${screen.id})" class="iframe-btn text-emerald-400 hover:text-emerald-300" title="Descargar PDF"><i class="fa-solid fa-download"></i></button>
                                     <button onclick="App.closeScreenTool(${screen.id})" class="iframe-btn text-red-400 hover:text-red-300" title="Cerrar PDF"><i class="fa-solid fa-times"></i></button>
                                 </div>
                             </div>
@@ -1071,12 +1064,13 @@
                                         </div>
                                         <div class="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
                                             <button onclick="document.getElementById('frame-${screen.id}').src = '${tool.url}'" class="iframe-btn" title="Recargar"><i class="fa-solid fa-rotate-right"></i></button>
+                                            <button onclick="App.downloadScreenPdf(${screen.id})" class="iframe-btn text-emerald-400" title="Descargar PDF/archivo desde esta pestaña"><i class="fa-solid fa-download"></i></button>
                                             <button onclick="App.openToolExternal('${tool.url}', '${tool.id}')" class="iframe-btn" title="Abrir externamente"><i class="fa-solid fa-external-link"></i></button>
                                             <button onclick="App.expandScreen(${screen.id})" class="iframe-btn text-brand-400" title="Expandir"><i class="fa-solid fa-expand"></i></button>
                                             <button onclick="App.closeScreenTool(${screen.id})" class="iframe-btn text-red-400 hover:text-red-300" title="Cerrar"><i class="fa-solid fa-times"></i></button>
                                         </div>
                                     </div>
-                                    <iframe id="frame-${screen.id}" src="${tool.url}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+                                    <iframe id="frame-${screen.id}" src="${tool.url}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads allow-popups-to-escape-sandbox"></iframe>
                                 `;
                             }
                         } else {
@@ -1193,7 +1187,7 @@
                         </div>
                     `;
                 } else {
-                    body.innerHTML = `<iframe id="alerta-iframe" src="${url}" class="border-none" style="width:100%; height:100%; border:none;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>`;
+                    body.innerHTML = `<iframe id="alerta-iframe" src="${url}" class="border-none" style="width:100%; height:100%; border:none;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads allow-popups-to-escape-sandbox"></iframe>`;
                     UI.applyAlertaZoom();
                 }
             },
@@ -1450,9 +1444,70 @@
                     UI.renderWorkspaceScreens();
                 }
             },
+
+
+            forceDownloadUrl: (url, filename = 'documento.pdf') => {
+                if (!url) return;
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename || 'documento.pdf';
+                a.rel = 'noopener';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            },
+
+            downloadScreenPdf: (screenId) => {
+                const screen = State.session.activeScreens.find(s => s.id === screenId);
+                if (!screen) return;
+
+                // PDF local cargado por el usuario: descarga directa garantizada.
+                if (screen.pdfUrl) {
+                    App.forceDownloadUrl(screen.pdfUrl, screen.pdfName || 'documento.pdf');
+                    return;
+                }
+
+                const tool = State.tools.find(t => t.id === screen.toolId);
+                if (!tool) return;
+
+                // Si la propia URL de la herramienta es un PDF directo.
+                if (/\.pdf(?:$|[?#])/i.test(tool.url)) {
+                    App.forceDownloadUrl(tool.url, (tool.name || 'documento') + '.pdf');
+                    return;
+                }
+
+                // En páginas del mismo origen intentamos encontrar el PDF/enlace generado.
+                // En sitios externos el navegador bloquea leer el DOM por seguridad; aun así,
+                // el sandbox ya incluye allow-downloads para que funcione su botón Descargar.
+                const frame = document.getElementById(`frame-${screenId}`);
+                if (frame) {
+                    try {
+                        const doc = frame.contentDocument || frame.contentWindow.document;
+                        const links = Array.from(doc.querySelectorAll('a[href], a[download]'));
+                        const candidate = links.find(a => a.hasAttribute('download') || /\.pdf(?:$|[?#])/i.test(a.href || ''));
+                        if (candidate) {
+                            candidate.click();
+                            return;
+                        }
+
+                        const embedded = doc.querySelector('embed[type="application/pdf"], object[type="application/pdf"], iframe[src*=".pdf"]');
+                        const src = embedded && (embedded.src || embedded.data);
+                        if (src) {
+                            App.forceDownloadUrl(src, (tool.name || 'documento') + '.pdf');
+                            return;
+                        }
+                    } catch (e) {
+                        // Cross-origin: no se puede inspeccionar el contenido, pero sí descargar
+                        // usando el botón propio de la web dentro de la pestaña.
+                    }
+                }
+
+                alert('La descarga dentro de esta pestaña ya está habilitada. Usa el botón Descargar/Exportar PDF de la aplicación abierta. Si la web es externa, el navegador no permite detectar automáticamente su archivo por seguridad.');
+            },
             
             loadInitialData: () => {
-                State.tools = [...INITIAL_TOOLS];
+                State.tools = [];
+                State.recents = [];
                 StorageDB.save();
             },
 
@@ -1640,7 +1695,9 @@
                 const note = State.notes.find(n => n.id === id);
                 if(note) {
                     note.text = text;
-                    StorageDB.save();
+                    // Guardado silencioso: local inmediato + nube con debounce,
+                    // sin refrescar herramientas, iframes, calculadora ni la propia nota.
+                    StorageDB.save(true);
                 }
             },
 
